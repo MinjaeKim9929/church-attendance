@@ -1,0 +1,11 @@
+{
+  "name": "church-attendance",
+  "scripts": {
+    "client":"bun run dev --prefix client",
+    "server":"npm run backend --prefix server",
+    "dev": "concurrently \"npm run dev --prefix client\" \"npm run backend --prefix server\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
