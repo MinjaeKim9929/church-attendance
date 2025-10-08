@@ -1,11 +1,12 @@
-import express from 'express';
-import dotenv from 'dotenv';
-import cors from 'cors';
-import connectDB from './lib/db.js';
-import bodyParser from 'body-parser';
+const express = require('express');
+const dotenv = require('dotenv');
+const cors = require('cors');
+const bodyParser = require('body-parser');
+
+const connectDB = require('./lib/db.js');
 
 dotenv.config();
-await connectDB();
+connectDB();
 
 const app = express();
 
