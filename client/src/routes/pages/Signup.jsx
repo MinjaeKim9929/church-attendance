@@ -72,7 +72,7 @@ export default function SignUpPage() {
 								value={password}
 								onChange={(e) => setPassword(e.target.value)}
 								className="w-full px-4 py-2.5 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
-								placeholder="Create a strong password"
+								placeholder="Create a password"
 								required
 							/>
 						</div>
@@ -106,7 +106,7 @@ export default function SignUpPage() {
 							Already have an account?{' '}
 							<a
 								href="/login"
-								className="text-blue-600 hover:text-blue-700 hover:underline underline font-medium transition-colors"
+								className="text-blue-600 hover:text-blue-700 hover:underline font-medium transition-colors"
 							>
 								Sign in
 							</a>
