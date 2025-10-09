@@ -5,10 +5,54 @@ export default function Login() {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [showPassword, setShowPassword] = useState(false);
+	const [errors, setErrors] = useState({ email: '', password: '' });
+
+	const validateEmail = (email) => {
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		return emailRegex.test(email);
+	};
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		console.log('Login attempt: ', { email, password });
+
+		const newErrors = { email: '', password: '' };
+
+		// Check if email is empty
+		if (!email.trim()) {
+			newErrors.email = 'Email address is required';
+		}
+		// Check if email format is valid
+		else if (!validateEmail(email)) {
+			newErrors.email = 'Please enter a valid email address';
+		}
+
+		// Check if password is empty
+		if (!password) {
+			newErrors.password = 'Password is required';
+		}
+
+		setErrors(newErrors);
+
+		// If there are no errors, proceed with login
+		if (!newErrors.email && !newErrors.password) {
+			console.log('Login attempt: ', { email, password });
+			// Add your login logic here
+		}
+	};
+
+	// Clear error when user starts typing
+	const handleEmailChange = (e) => {
+		setEmail(e.target.value);
+		if (errors.email) {
+			setErrors({ ...errors, email: '' });
+		}
+	};
+
+	const handlePasswordChange = (e) => {
+		setPassword(e.target.value);
+		if (errors.password) {
+			setErrors({ ...errors, password: '' });
+		}
 	};
 
 	return (
@@ -32,7 +76,7 @@ export default function Login() {
 					</div>
 
 					{/* Form */}
-					<form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
+					<form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5" noValidate>
 						<div>
 							<label htmlFor="email" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
 								Email Address
@@ -41,11 +85,15 @@ export default function Login() {
 								type="email"
 								id="email"
 								value={email}
-								onChange={(e) => setEmail(e.target.value)}
-								className="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+								onChange={handleEmailChange}
+								className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base border rounded-lg transition-all outline-none ${
+									errors.email
+										? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-transparent'
+										: 'border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+								}`}
 								placeholder="your.email@example.com"
-								required
 							/>
+							{errors.email && <p className="mt-1.5 text-xs sm:text-sm text-red-600">{errors.email}</p>}
 						</div>
 
 						<div>
@@ -57,10 +105,13 @@ export default function Login() {
 									type={showPassword ? 'text' : 'password'}
 									id="password"
 									value={password}
-									onChange={(e) => setPassword(e.target.value)}
-									className="w-full px-3 sm:px-4 py-2 sm:py-2.5 pr-10 sm:pr-12 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+									onChange={handlePasswordChange}
+									className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 pr-10 sm:pr-12 text-sm sm:text-base border rounded-lg transition-all outline-none ${
+										errors.password
+											? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-transparent'
+											: 'border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+									}`}
 									placeholder="Enter your password"
-									required
 								/>
 								<button
 									type="button"
@@ -75,6 +126,7 @@ export default function Login() {
 									)}
 								</button>
 							</div>
+							{errors.password && <p className="mt-1.5 text-xs sm:text-sm text-red-600">{errors.password}</p>}
 						</div>
 
 						<div className="flex items-center justify-between text-xs sm:text-sm">
@@ -99,10 +151,7 @@ export default function Login() {
 					<div className="mt-5 sm:mt-6 text-center">
 						<p className="text-xs sm:text-sm text-gray-600">
 							Don't have an account?{' '}
-							<a
-								href="/signup"
-								className="text-blue-600 hover:text-blue-700 font-medium transition-colors hover:underline"
-							>
+							<a href="/signup" className="text-blue-600 hover:text-blue-700 font-medium transition-colors">
 								Sign up
 							</a>
 						</p>

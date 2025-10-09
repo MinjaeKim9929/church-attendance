@@ -5,20 +5,120 @@ export default function SignUpPage() {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [confirmPassword, setConfirmPassword] = useState('');
+	const [errors, setErrors] = useState({ fullName: '', email: '', password: '', confirmPassword: '' });
+	const [touched, setTouched] = useState({ fullName: false, email: false, password: false, confirmPassword: false });
+
+	const validateEmail = (email) => {
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		return emailRegex.test(email);
+	};
+
+	const validateField = (fieldName, value) => {
+		let error = '';
+
+		switch (fieldName) {
+			case 'fullName':
+				if (!value.trim()) {
+					error = 'Full name is required';
+				}
+				break;
+			case 'email':
+				if (!value.trim()) {
+					error = 'Email address is required';
+				} else if (!validateEmail(value)) {
+					error = 'Please enter a valid email address';
+				}
+				break;
+			case 'password':
+				if (!value) {
+					error = 'Password is required';
+				}
+				break;
+			case 'confirmPassword':
+				if (!value) {
+					error = 'Please confirm your password';
+				} else if (password && value !== password) {
+					error = 'Passwords do not match';
+				}
+				break;
+		}
+
+		return error;
+	};
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		console.log('Sign up attempt:', { fullName, email, password, confirmPassword });
+
+		const newErrors = {
+			fullName: validateField('fullName', fullName),
+			email: validateField('email', email),
+			password: validateField('password', password),
+			confirmPassword: validateField('confirmPassword', confirmPassword),
+		};
+
+		setErrors(newErrors);
+		setTouched({ fullName: true, email: true, password: true, confirmPassword: true });
+
+		// If there are no errors, proceed with signup
+		if (!newErrors.fullName && !newErrors.email && !newErrors.password && !newErrors.confirmPassword) {
+			console.log('Sign up attempt:', { fullName, email, password, confirmPassword });
+			// Add your signup logic here
+		}
+	};
+
+	const handleBlur = (fieldName, value) => {
+		setTouched({ ...touched, [fieldName]: true });
+		// Only show "required" error on blur if field is empty
+		if (!value.trim()) {
+			const error = validateField(fieldName, value);
+			setErrors({ ...errors, [fieldName]: error });
+		}
+	};
+
+	const handleFullNameChange = (e) => {
+		setFullName(e.target.value);
+		// Clear error when user starts typing
+		if (errors.fullName) {
+			setErrors({ ...errors, fullName: '' });
+		}
+	};
+
+	const handleEmailChange = (e) => {
+		setEmail(e.target.value);
+		// Clear error when user starts typing
+		if (errors.email) {
+			setErrors({ ...errors, email: '' });
+		}
+	};
+
+	const handlePasswordChange = (e) => {
+		setPassword(e.target.value);
+		// Clear error when user starts typing
+		if (errors.password) {
+			setErrors({ ...errors, password: '' });
+		}
+		// Clear confirm password error if it exists
+		if (errors.confirmPassword) {
+			setErrors((prev) => ({ ...prev, confirmPassword: '' }));
+		}
+	};
+
+	const handleConfirmPasswordChange = (e) => {
+		setConfirmPassword(e.target.value);
+		// Clear error when user starts typing
+		if (errors.confirmPassword) {
+			setErrors({ ...errors, confirmPassword: '' });
+		}
 	};
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-blue-100 via-white to-indigo-100 flex items-center justify-center p-4">
+		<div className="min-h-screen bg-gradient-to-br from-blue-100 via-white to-indigo-100 flex items-center justify-center p-4 sm:p-6 lg:p-8">
 			<div className="w-full max-w-md">
-				<div className="bg-white rounded-lg shadow-lg p-8 border border-gray-100">
+				<div className="bg-white rounded-lg shadow-lg p-6 sm:p-8 border border-gray-100">
 					{/* Header */}
-					<div className="text-center mb-8">
-						<div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-full mb-4">
-							<svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<div className="text-center mb-6 sm:mb-8">
+						<div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-blue-600 rounded-full mb-3 sm:mb-4">
+							<svg className="w-7 h-7 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path
 									strokeLinecap="round"
 									strokeLinejoin="round"
@@ -27,82 +127,113 @@ export default function SignUpPage() {
 								/>
 							</svg>
 						</div>
-						<h1 className="text-2xl font-semibold text-gray-900 mb-2">Create Account</h1>
+						<h1 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">Create Account</h1>
 					</div>
 
 					{/* Form */}
-					<form onSubmit={handleSubmit} className="space-y-5">
+					<form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5" noValidate>
 						<div>
-							<label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">
+							<label htmlFor="fullName" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
 								Full Name
 							</label>
 							<input
 								type="text"
 								id="fullName"
 								value={fullName}
-								onChange={(e) => setFullName(e.target.value)}
-								className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+								onChange={handleFullNameChange}
+								onBlur={() => handleBlur('fullName', fullName)}
+								className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base border rounded-lg transition-all outline-none ${
+									errors.fullName && touched.fullName
+										? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-transparent'
+										: 'border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+								}`}
 								placeholder="John Doe"
-								required
 							/>
+							{errors.fullName && touched.fullName && (
+								<p className="mt-1.5 text-xs sm:text-sm text-red-600">{errors.fullName}</p>
+							)}
 						</div>
 
 						<div>
-							<label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+							<label htmlFor="email" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
 								Email Address
 							</label>
 							<input
 								type="email"
 								id="email"
 								value={email}
-								onChange={(e) => setEmail(e.target.value)}
-								className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+								onChange={handleEmailChange}
+								onBlur={() => handleBlur('email', email)}
+								className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base border rounded-lg transition-all outline-none ${
+									errors.email && touched.email
+										? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-transparent'
+										: 'border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+								}`}
 								placeholder="your.email@example.com"
-								required
 							/>
+							{errors.email && touched.email && (
+								<p className="mt-1.5 text-xs sm:text-sm text-red-600">{errors.email}</p>
+							)}
 						</div>
 
 						<div>
-							<label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+							<label htmlFor="password" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
 								Password
 							</label>
 							<input
 								type="text"
 								id="password"
 								value={password}
-								onChange={(e) => setPassword(e.target.value)}
-								className="w-full px-4 py-2.5 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+								onChange={handlePasswordChange}
+								onBlur={() => handleBlur('password', password)}
+								className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 pr-10 sm:pr-12 text-sm sm:text-base border rounded-lg transition-all outline-none ${
+									errors.password && touched.password
+										? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-transparent'
+										: 'border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+								}`}
 								placeholder="Create a password"
-								required
 							/>
+							{errors.password && touched.password && (
+								<p className="mt-1.5 text-xs sm:text-sm text-red-600">{errors.password}</p>
+							)}
 						</div>
 
 						<div>
-							<label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+							<label
+								htmlFor="confirmPassword"
+								className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2"
+							>
 								Confirm Password
 							</label>
 							<input
 								type="password"
 								id="confirmPassword"
 								value={confirmPassword}
-								onChange={(e) => setConfirmPassword(e.target.value)}
-								className="w-full px-4 py-2.5 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+								onChange={handleConfirmPasswordChange}
+								onBlur={() => handleBlur('confirmPassword', confirmPassword)}
+								className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 pr-10 sm:pr-12 text-sm sm:text-base border rounded-lg transition-all outline-none ${
+									errors.confirmPassword && touched.confirmPassword
+										? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-transparent'
+										: 'border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+								}`}
 								placeholder="Re-enter your password"
-								required
 							/>
+							{errors.confirmPassword && touched.confirmPassword && (
+								<p className="mt-1.5 text-xs sm:text-sm text-red-600">{errors.confirmPassword}</p>
+							)}
 						</div>
 
 						<button
 							type="submit"
-							className="w-full bg-blue-600 hover:bg-blue-700 hover:cursor-pointer text-white font-medium py-2.5 rounded-lg transition-colors shadow-sm hover:shadow-md mt-2"
+							className="w-full bg-blue-600 hover:bg-blue-700 hover:cursor-pointer text-white font-medium py-2 sm:py-2.5 text-sm sm:text-base rounded-lg transition-colors shadow-sm hover:shadow-md mt-2"
 						>
 							Create Account
 						</button>
 					</form>
 
 					{/* Footer */}
-					<div className="mt-6 text-center">
-						<p className="text-sm text-gray-600">
+					<div className="mt-5 sm:mt-6 text-center">
+						<p className="text-xs sm:text-sm text-gray-600">
 							Already have an account?{' '}
 							<a
 								href="/login"
