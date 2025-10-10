@@ -32,6 +32,8 @@ export default function SignUpPage() {
 			case 'password':
 				if (!value) {
 					error = 'Password is required';
+				} else if (value.length < 8) {
+					error = 'Password must be at least 8 characters long';
 				}
 				break;
 			case 'confirmPassword':
@@ -68,11 +70,9 @@ export default function SignUpPage() {
 
 	const handleBlur = (fieldName, value) => {
 		setTouched({ ...touched, [fieldName]: true });
-		// Only show "required" error on blur if field is empty
-		if (!value.trim()) {
-			const error = validateField(fieldName, value);
-			setErrors({ ...errors, [fieldName]: error });
-		}
+		// Validate all rules on blur (including format and length validation)
+		const error = validateField(fieldName, value);
+		setErrors({ ...errors, [fieldName]: error });
 	};
 
 	const handleFullNameChange = (e) => {
