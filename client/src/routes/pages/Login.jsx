@@ -1,10 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { EyeClosed, Eye } from 'lucide-react';
+import { useAuth } from '../../context/useAuth';
 
 export default function Login() {
+	const { login, isLoading: authLoading, error: authError, clearError } = useAuth();
+
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [showPassword, setShowPassword] = useState(false);
+	const [rememberMe, setRememberMe] = useState(false);
 	const [errors, setErrors] = useState({ email: '', password: '' });
 
 	const validateEmail = (email) => {
@@ -12,8 +16,14 @@ export default function Login() {
 		return emailRegex.test(email);
 	};
 
-	const handleSubmit = (e) => {
+	useEffect(() => {
+		const savedEmail = localStorage.getItem('rememberedEmail');
+		if (savedEmail) setEmail(savedEmail);
+	}, []);
+
+	const handleSubmit = async (e) => {
 		e.preventDefault();
+		clearError();
 
 		const newErrors = { email: '', password: '' };
 
@@ -31,12 +41,24 @@ export default function Login() {
 			newErrors.password = 'Password is required';
 		}
 
+		if (rememberMe) {
+			localStorage.setItem('rememberedEmail', email);
+		} else {
+			localStorage.removeItem('rememberedEmail');
+		}
+
 		setErrors(newErrors);
 
 		// If there are no errors, proceed with login
 		if (!newErrors.email && !newErrors.password) {
 			console.log('Login attempt: ', { email, password });
-			// Add your login logic here
+			try {
+				await login({ email, password, rememberMe });
+				// TODO: Redirect to dashboard or home page
+				alert('Login successful!');
+			} catch (error) {
+				console.error('Login error:', error);
+			}
 		}
 	};
 
@@ -46,12 +68,18 @@ export default function Login() {
 		if (errors.email) {
 			setErrors({ ...errors, email: '' });
 		}
+		if (authError) {
+			clearError();
+		}
 	};
 
 	const handlePasswordChange = (e) => {
 		setPassword(e.target.value);
 		if (errors.password) {
 			setErrors({ ...errors, password: '' });
+		}
+		if (authError) {
+			clearError();
 		}
 	};
 
@@ -75,6 +103,12 @@ export default function Login() {
 						<p className="text-gray-600 text-xs sm:text-sm">Sign in to access your account</p>
 					</div>
 
+					{authError && (
+						<div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+							<p className="text-sm text-red-600">{authError}</p>
+						</div>
+					)}
+
 					{/* Form */}
 					<form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5" noValidate>
 						<div>
@@ -86,7 +120,8 @@ export default function Login() {
 								id="email"
 								value={email}
 								onChange={handleEmailChange}
-								className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base border rounded-lg transition-all outline-none ${
+								disable={authLoading}
+								className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base border rounded-lg transition-all outline-none disabled:bg-gray-50 disabled:cursor-not-allowed ${
 									errors.email
 										? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-transparent'
 										: 'border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent'
@@ -106,7 +141,8 @@ export default function Login() {
 									id="password"
 									value={password}
 									onChange={handlePasswordChange}
-									className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 pr-10 sm:pr-12 text-sm sm:text-base border rounded-lg transition-all outline-none ${
+									disabled={authLoading}
+									className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 pr-10 sm:pr-12 text-sm sm:text-base border rounded-lg transition-all outline-none disabled:bg-gray-50 disabled:cursor-not-allowed ${
 										errors.password
 											? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-transparent'
 											: 'border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent'
@@ -116,7 +152,8 @@ export default function Login() {
 								<button
 									type="button"
 									onClick={() => setShowPassword(!showPassword)}
-									className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors p-1"
+									disabled={authLoading}
+									className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors p-1 disabled:opacity-50"
 									aria-label={showPassword ? 'Hide password' : 'Show password'}
 								>
 									{showPassword ? (
@@ -133,7 +170,10 @@ export default function Login() {
 							<label className="flex items-center cursor-pointer">
 								<input
 									type="checkbox"
+									checked={rememberMe}
+									onChange={(e) => setRememberMe(e.target.checked)}
 									className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+									disabled={authLoading}
 								/>
 								<span className="ml-1.5 sm:ml-2 text-gray-600">Remember me</span>
 							</label>
@@ -141,7 +181,8 @@ export default function Login() {
 
 						<button
 							type="submit"
-							className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 sm:py-2.5 text-sm sm:text-base rounded-lg transition-colors shadow-sm hover:shadow-md hover:cursor-pointer"
+							disabled={authLoading}
+							className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 sm:py-2.5 text-sm sm:text-base rounded-lg transition-colors shadow-sm hover:shadow-md hover:cursor-pointer disabled:bg-blue-400 disabled:cursor-not-allowed"
 						>
 							Sign In
 						</button>
@@ -151,7 +192,10 @@ export default function Login() {
 					<div className="mt-5 sm:mt-6 text-center">
 						<p className="text-xs sm:text-sm text-gray-600">
 							Don't have an account?{' '}
-							<a href="/signup" className="text-blue-600 hover:text-blue-700 font-medium transition-colors">
+							<a
+								href="/signup"
+								className="text-blue-600 hover:text-blue-700 hover:underline font-medium transition-colors"
+							>
 								Sign up
 							</a>
 						</p>

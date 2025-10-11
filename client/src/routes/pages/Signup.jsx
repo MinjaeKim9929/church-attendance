@@ -1,6 +1,9 @@
 import { useState } from 'react';
+import { useAuth } from '../../context/useAuth';
 
 export default function SignUpPage() {
+	const { signup, isLoading: authLoading, error: authError, clearError } = useAuth();
+
 	const [fullName, setFullName] = useState('');
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
@@ -48,8 +51,9 @@ export default function SignUpPage() {
 		return error;
 	};
 
-	const handleSubmit = (e) => {
+	const handleSubmit = async (e) => {
 		e.preventDefault();
+		clearError();
 
 		const newErrors = {
 			fullName: validateField('fullName', fullName),
@@ -63,8 +67,13 @@ export default function SignUpPage() {
 
 		// If there are no errors, proceed with signup
 		if (!newErrors.fullName && !newErrors.email && !newErrors.password && !newErrors.confirmPassword) {
-			console.log('Sign up attempt:', { fullName, email, password, confirmPassword });
-			// Add your signup logic here
+			try {
+				await signup({ fullName, email, password });
+				// TODO: Redirect to dashboard or home page
+				alert('Signup successful!');
+			} catch (error) {
+				console.error('Signup error:', error);
+			}
 		}
 	};
 
@@ -81,6 +90,9 @@ export default function SignUpPage() {
 		if (errors.fullName) {
 			setErrors({ ...errors, fullName: '' });
 		}
+		if (authError) {
+			clearError();
+		}
 	};
 
 	const handleEmailChange = (e) => {
@@ -88,6 +100,9 @@ export default function SignUpPage() {
 		// Clear error when user starts typing
 		if (errors.email) {
 			setErrors({ ...errors, email: '' });
+		}
+		if (authError) {
+			clearError();
 		}
 	};
 
@@ -101,6 +116,9 @@ export default function SignUpPage() {
 		if (errors.confirmPassword) {
 			setErrors((prev) => ({ ...prev, confirmPassword: '' }));
 		}
+		if (authError) {
+			clearError();
+		}
 	};
 
 	const handleConfirmPasswordChange = (e) => {
@@ -109,6 +127,9 @@ export default function SignUpPage() {
 		if (errors.confirmPassword) {
 			setErrors({ ...errors, confirmPassword: '' });
 		}
+		if (authError) {
+			clearError();
+		}
 	};
 
 	return (
@@ -116,7 +137,7 @@ export default function SignUpPage() {
 			<div className="w-full max-w-md">
 				<div className="bg-white rounded-lg shadow-lg p-6 sm:p-8 border border-gray-100">
 					{/* Header */}
-					<div className="text-center mb-6 sm:mb-8">
+					<div className="text-center mb-3 sm:mb-5">
 						<div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-blue-600 rounded-full mb-3 sm:mb-4">
 							<svg className="w-7 h-7 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path
@@ -130,6 +151,13 @@ export default function SignUpPage() {
 						<h1 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">Create Account</h1>
 					</div>
 
+					{/* API Error Message */}
+					{authError && (
+						<div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+							<p className="text-sm text-red-600">{authError}</p>
+						</div>
+					)}
+
 					{/* Form */}
 					<form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5" noValidate>
 						<div>
@@ -142,7 +170,8 @@ export default function SignUpPage() {
 								value={fullName}
 								onChange={handleFullNameChange}
 								onBlur={() => handleBlur('fullName', fullName)}
-								className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base border rounded-lg transition-all outline-none ${
+								disabled={authLoading}
+								className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base border rounded-lg transition-all outline-none disabled:bg-gray-50 disabled:cursor-not-allowed ${
 									errors.fullName && touched.fullName
 										? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-transparent'
 										: 'border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent'
@@ -164,7 +193,8 @@ export default function SignUpPage() {
 								value={email}
 								onChange={handleEmailChange}
 								onBlur={() => handleBlur('email', email)}
-								className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base border rounded-lg transition-all outline-none ${
+								disabled={authLoading}
+								className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base border rounded-lg transition-all outline-none disabled:bg-gray-50 disabled:cursor-not-allowed ${
 									errors.email && touched.email
 										? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-transparent'
 										: 'border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent'
@@ -186,7 +216,8 @@ export default function SignUpPage() {
 								value={password}
 								onChange={handlePasswordChange}
 								onBlur={() => handleBlur('password', password)}
-								className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 pr-10 sm:pr-12 text-sm sm:text-base border rounded-lg transition-all outline-none ${
+								disabled={authLoading}
+								className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 pr-10 sm:pr-12 text-sm sm:text-base border rounded-lg transition-all outline-none disabled:bg-gray-50 disabled:cursor-not-allowed ${
 									errors.password && touched.password
 										? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-transparent'
 										: 'border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent'
@@ -211,7 +242,8 @@ export default function SignUpPage() {
 								value={confirmPassword}
 								onChange={handleConfirmPasswordChange}
 								onBlur={() => handleBlur('confirmPassword', confirmPassword)}
-								className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 pr-10 sm:pr-12 text-sm sm:text-base border rounded-lg transition-all outline-none ${
+								disabled={authLoading}
+								className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 pr-10 sm:pr-12 text-sm sm:text-base border rounded-lg transition-all outline-none disabled:bg-gray-50 disabled:cursor-not-allowed ${
 									errors.confirmPassword && touched.confirmPassword
 										? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-transparent'
 										: 'border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent'
@@ -225,9 +257,10 @@ export default function SignUpPage() {
 
 						<button
 							type="submit"
-							className="w-full bg-blue-600 hover:bg-blue-700 hover:cursor-pointer text-white font-medium py-2 sm:py-2.5 text-sm sm:text-base rounded-lg transition-colors shadow-sm hover:shadow-md mt-2"
+							disabled={authLoading}
+							className="w-full bg-blue-600 hover:bg-blue-700 hover:cursor-pointer text-white font-medium py-2 sm:py-2.5 text-sm sm:text-base rounded-lg transition-colors shadow-sm hover:shadow-md mt-2 disabled:bg-blue-400 disabled:cursor-not-allowed"
 						>
-							Create Account
+							{authLoading ? 'Creating Account...' : 'Create Account'}
 						</button>
 					</form>
 
