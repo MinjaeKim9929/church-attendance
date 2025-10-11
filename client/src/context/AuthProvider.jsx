@@ -2,7 +2,11 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { AuthContext } from './AuthContext';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+let API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+if (!API_URL.endsWith('/api')) {
+	API_URL = API_URL.replace(/\/+$/, '');
+	API_URL = API_URL + '/api';
+}
 axios.defaults.baseURL = API_URL;
 axios.defaults.withCredentials = true;
 
@@ -15,7 +19,7 @@ export const AuthProvider = ({ children }) => {
 	useEffect(() => {
 		const fetchUser = async () => {
 			try {
-				const res = await axios.get(`${API_URL}/auth/me`);
+				const res = await axios.get('/auth/me');
 				setUser(res.data);
 			} catch (err) {
 				console.error(err.message);
