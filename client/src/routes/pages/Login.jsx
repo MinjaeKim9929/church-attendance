@@ -38,16 +38,16 @@ export default function Login() {
 
 		// Check if email is empty
 		if (!email.trim()) {
-			newErrors.email = 'Email address is required';
+			newErrors.email = '이메일 주소를 입력해주세요';
 		}
 		// Check if email format is valid
 		else if (!validateEmail(email)) {
-			newErrors.email = 'Please enter a valid email address';
+			newErrors.email = '올바른 이메일 주소를 입력해주세요';
 		}
 
 		// Check if password is empty
 		if (!password) {
-			newErrors.password = 'Password is required';
+			newErrors.password = '비밀번호를 입력해주세요';
 		}
 
 		if (rememberMe) {
@@ -107,8 +107,8 @@ export default function Login() {
 								/>
 							</svg>
 						</div>
-						<h1 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">Attendance Management</h1>
-						<p className="text-gray-600 text-xs sm:text-sm">Sign in to access your account</p>
+						<h1 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">출석 관리 시스템</h1>
+						<p className="text-gray-600 text-xs sm:text-sm">로그인하여 계정에 접속하세요</p>
 					</div>
 
 					{authError && (
@@ -121,7 +121,7 @@ export default function Login() {
 					<form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5" noValidate>
 						<div>
 							<label htmlFor="email" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
-								Email Address
+								이메일 주소
 							</label>
 							<input
 								type="email"
@@ -141,7 +141,7 @@ export default function Login() {
 
 						<div>
 							<label htmlFor="password" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
-								Password
+								비밀번호
 							</label>
 							<div className="relative">
 								<input
@@ -155,14 +155,14 @@ export default function Login() {
 											? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-transparent'
 											: 'border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent'
 									}`}
-									placeholder="Enter your password"
+									placeholder="비밀번호를 입력하세요"
 								/>
 								<button
 									type="button"
 									onClick={() => setShowPassword(!showPassword)}
 									disabled={authLoading}
 									className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors p-1 disabled:opacity-50"
-									aria-label={showPassword ? 'Hide password' : 'Show password'}
+									aria-label={showPassword ? '비밀번호 숨기기' : '비밀번호 보기'}
 								>
 									{showPassword ? (
 										<EyeClosed className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -183,7 +183,7 @@ export default function Login() {
 									className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
 									disabled={authLoading}
 								/>
-								<span className="ml-1.5 sm:ml-2 text-gray-600">Remember me</span>
+								<span className="ml-1.5 sm:ml-2 text-gray-600">로그인 상태 유지</span>
 							</label>
 						</div>
 
@@ -192,19 +192,19 @@ export default function Login() {
 							disabled={authLoading}
 							className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 sm:py-2.5 text-sm sm:text-base rounded-lg transition-colors shadow-sm hover:shadow-md hover:cursor-pointer disabled:bg-blue-400 disabled:cursor-not-allowed"
 						>
-							Sign In
+							로그인
 						</button>
 					</form>
 
 					{/* Footer */}
 					<div className="mt-5 sm:mt-6 text-center">
 						<p className="text-xs sm:text-sm text-gray-600">
-							Don't have an account?{' '}
+							계정이 없으신가요?{' '}
 							<a
 								href="/signup"
 								className="text-blue-600 hover:text-blue-700 hover:underline font-medium transition-colors"
 							>
-								Sign up
+								회원가입
 							</a>
 						</p>
 					</div>

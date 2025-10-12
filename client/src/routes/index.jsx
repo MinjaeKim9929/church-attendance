@@ -3,7 +3,9 @@ import ProtectedLayout from './pages/layouts/ProtectedLayout';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
-import Dashboard from './pages/Dashboard';
+import Dashboard from './pages/dashboard/Dashboard';
+import Students from './pages/dashboard/Students';
+import StudentDetail from './pages/dashboard/StudentDetail';
 import NotFound from './pages/NotFound';
 
 const router = createBrowserRouter([
@@ -25,6 +27,14 @@ const router = createBrowserRouter([
 			{
 				path: '/dashboard',
 				element: <Dashboard />,
+			},
+			{
+				path: '/dashboard/students',
+				element: <Students />,
+			},
+			{
+				path: '/dashboard/students/:id',
+				element: <StudentDetail />,
 			},
 		],
 	},

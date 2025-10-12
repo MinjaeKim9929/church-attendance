@@ -18,22 +18,22 @@ export default function Sidebar() {
 
 	const navigationItems = [
 		{
-			name: 'Dashboard',
+			name: '대시보드',
 			path: '/dashboard',
 			icon: Home,
 		},
 		{
-			name: 'Members',
-			path: '/dashboard/members',
+			name: '학생 관리',
+			path: '/dashboard/students',
 			icon: Users,
 		},
 		{
-			name: 'Attendance',
+			name: '출석 관리',
 			path: '/dashboard/attendance',
 			icon: Calendar,
 		},
 		{
-			name: 'Settings',
+			name: '설정',
 			path: '/dashboard/settings',
 			icon: Settings,
 		},
@@ -53,7 +53,7 @@ export default function Sidebar() {
 			<button
 				onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
 				className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-md border border-gray-200 hover:bg-gray-50 transition-colors"
-				aria-label="Toggle menu"
+				aria-label="메뉴 토글"
 			>
 				{isMobileMenuOpen ? <X className="w-6 h-6 text-gray-700" /> : <Menu className="w-6 h-6 text-gray-700" />}
 			</button>
@@ -82,8 +82,8 @@ export default function Sidebar() {
 						</svg>
 					</div>
 					<div>
-						<h1 className="text-lg font-semibold text-gray-900">Attendance</h1>
-						<p className="text-xs text-gray-500">Management</p>
+						<h1 className="text-lg font-semibold text-gray-900">출석 관리</h1>
+						<p className="text-xs text-gray-500">시스템</p>
 					</div>
 				</div>
 
@@ -134,7 +134,7 @@ export default function Sidebar() {
 						className="flex items-center gap-3 w-full px-4 py-3 text-red-600 hover:bg-red-50 hover:cursor-pointer rounded-lg transition-colors"
 					>
 						<LogOut className="w-5 h-5" />
-						<span className="font-medium text-sm">Logout</span>
+						<span className="font-medium text-sm">로그아웃</span>
 					</button>
 				</div>
 			</div>
