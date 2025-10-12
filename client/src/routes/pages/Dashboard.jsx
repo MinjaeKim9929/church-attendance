@@ -1,27 +1,21 @@
-import { useNavigate } from 'react-router';
-import { useAuth } from '../../context/useAuth';
+import Sidebar from '../../components/Sidebar';
 
 export default function Dashboard() {
-	const { logout } = useAuth();
-	const navigate = useNavigate();
-
-	const handleLogout = async () => {
-		try {
-			await logout();
-			navigate('/');
-		} catch (error) {
-			console.error('Logout error:', error);
-		}
-	};
-
 	return (
-		<div>
-			<button
-				onClick={handleLogout}
-				className="px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors"
-			>
-				Logout
-			</button>
+		<div className="flex h-screen bg-gray-50">
+			<Sidebar />
+			<main className="flex-1 overflow-y-auto">
+				<div className="p-6 sm:p-8 lg:pl-8 pt-16 lg:pt-6">
+					<h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">Dashboard</h1>
+					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+						{/* Dashboard content will go here */}
+						<div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+							<h2 className="text-lg font-semibold text-gray-900 mb-2">Welcome</h2>
+							<p className="text-gray-600">Your attendance management dashboard</p>
+						</div>
+					</div>
+				</div>
+			</main>
 		</div>
 	);
 }
