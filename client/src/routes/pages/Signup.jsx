@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router';
 import { useAuth } from '../../context/useAuth';
 
 export default function SignUpPage() {
-	const { signup, isLoading: authLoading, error: authError, clearError } = useAuth();
+	const { user, signup, isLoading: authLoading, error: authError, clearError } = useAuth();
+	const navigate = useNavigate();
 
 	const [fullName, setFullName] = useState('');
 	const [email, setEmail] = useState('');
@@ -15,6 +17,13 @@ export default function SignUpPage() {
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		return emailRegex.test(email);
 	};
+
+	// Redirect to dashboard if user is already logged in
+	useEffect(() => {
+		if (!authLoading && user) {
+			navigate('/dashboard');
+		}
+	}, [user, authLoading, navigate]);
 
 	const validateField = (fieldName, value) => {
 		let error = '';
@@ -69,8 +78,7 @@ export default function SignUpPage() {
 		if (!newErrors.fullName && !newErrors.email && !newErrors.password && !newErrors.confirmPassword) {
 			try {
 				await signup({ fullName, email, password });
-				// TODO: Redirect to dashboard or home page
-				alert('Signup successful!');
+				navigate('/dashboard');
 			} catch (error) {
 				console.error('Signup error:', error);
 			}
@@ -211,7 +219,7 @@ export default function SignUpPage() {
 								Password
 							</label>
 							<input
-								type="text"
+								type="password"
 								id="password"
 								value={password}
 								onChange={handlePasswordChange}

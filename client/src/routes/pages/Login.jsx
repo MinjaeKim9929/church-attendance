@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { EyeClosed, Eye } from 'lucide-react';
 import { useAuth } from '../../context/useAuth';
+import { useNavigate } from 'react-router';
 
 export default function Login() {
-	const { login, isLoading: authLoading, error: authError, clearError } = useAuth();
+	const { user, login, isLoading: authLoading, error: authError, clearError } = useAuth();
+	const navigate = useNavigate();
 
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
@@ -20,6 +22,13 @@ export default function Login() {
 		const savedEmail = localStorage.getItem('rememberedEmail');
 		if (savedEmail) setEmail(savedEmail);
 	}, []);
+
+	// Redirect to dashboard if user is already logged in
+	useEffect(() => {
+		if (!authLoading && user) {
+			navigate('/dashboard');
+		}
+	}, [user, authLoading, navigate]);
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
@@ -54,8 +63,7 @@ export default function Login() {
 			console.log('Login attempt: ', { email, password });
 			try {
 				await login({ email, password, rememberMe });
-				// TODO: Redirect to dashboard or home page
-				alert('Login successful!');
+				navigate('/dashboard');
 			} catch (error) {
 				console.error('Login error:', error);
 			}

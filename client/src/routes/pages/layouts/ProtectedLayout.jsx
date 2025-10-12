@@ -1,6 +1,6 @@
 import { Outlet, useNavigate } from 'react-router';
 import { useEffect } from 'react';
-import { useAuth } from '../../context/useAuth';
+import { useAuth } from '../../../context/useAuth';
 
 export default function ProtectedLayout() {
 	const { user, isLoading } = useAuth();
