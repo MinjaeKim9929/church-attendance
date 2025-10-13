@@ -6,6 +6,15 @@ const studentSchema = new mongoose.Schema(
 			type: String,
 			required: true,
 		},
+		christianName: {
+			type: String,
+			default: '',
+		},
+		nameDayMonth: {
+			type: String,
+			default: '',
+			enum: ['', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
+		},
 		grade: {
 			type: String,
 			required: true,
@@ -15,6 +24,22 @@ const studentSchema = new mongoose.Schema(
 			type: String,
 			required: true,
 			enum: ['남자', '여자', 'Male', 'Female'],
+		},
+		motherName: {
+			type: String,
+			default: '',
+		},
+		motherContact: {
+			type: String,
+			default: '',
+		},
+		fatherName: {
+			type: String,
+			default: '',
+		},
+		fatherContact: {
+			type: String,
+			default: '',
 		},
 	},
 	{ timestamps: true }

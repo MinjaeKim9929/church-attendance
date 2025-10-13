@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import axios from 'axios';
-import { Plus, Search } from 'lucide-react';
+import { Plus, Search, ArrowUpDown } from 'lucide-react';
 import AddStudentModal from '../../../components/AddStudentModal';
 import Sidebar from '../../../components/Sidebar';
 
@@ -15,25 +15,73 @@ export default function Students() {
 	const [error, setError] = useState('');
 	const [searchTerm, setSearchTerm] = useState('');
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [sortBy, setSortBy] = useState('grade');
+	const [sortOrder, setSortOrder] = useState('asc'); // 'asc' or 'desc'
+
+	// Grade order for sorting
+	const gradeOrder = ['JK', 'SK', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
 
 	// Fetch students on component mount
 	useEffect(() => {
 		fetchStudents();
 	}, []);
 
-	// Filter students based on search term
+	// Assign permanent numbers to all students based on grade + name
+	const studentsWithNumbers = students.map((student, index, array) => {
+		// Sort all students by grade then name to assign permanent numbers
+		const sortedForNumbering = [...array].sort((a, b) => {
+			const gradeA = gradeOrder.indexOf(a.grade);
+			const gradeB = gradeOrder.indexOf(b.grade);
+			if (gradeA !== gradeB) {
+				return gradeA - gradeB;
+			}
+			return a.fullName.localeCompare(b.fullName, 'ko');
+		});
+		// Find this student's position in the sorted array
+		const permanentNumber = sortedForNumbering.findIndex((s) => s._id === student._id) + 1;
+		return { ...student, permanentNumber };
+	});
+
+	// Sort and filter students based on search term and sort option
 	useEffect(() => {
-		if (searchTerm.trim() === '') {
-			setFilteredStudents(students);
-		} else {
-			const filtered = students.filter(
+		let filtered = studentsWithNumbers;
+
+		// Apply search filter
+		if (searchTerm.trim() !== '') {
+			filtered = studentsWithNumbers.filter(
 				(student) =>
 					student.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-					student.grade.toLowerCase().includes(searchTerm.toLowerCase())
+					student.christianName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+					student.grade.toLowerCase() === searchTerm.toLowerCase()
 			);
-			setFilteredStudents(filtered);
 		}
-	}, [searchTerm, students]);
+
+		// Apply sorting
+		const sorted = [...filtered].sort((a, b) => {
+			let comparison = 0;
+
+			if (sortBy === 'grade') {
+				// Sort by grade first, then by name
+				const gradeA = gradeOrder.indexOf(a.grade);
+				const gradeB = gradeOrder.indexOf(b.grade);
+				if (gradeA !== gradeB) {
+					comparison = gradeA - gradeB;
+				} else {
+					comparison = a.fullName.localeCompare(b.fullName, 'ko');
+				}
+			} else if (sortBy === 'name') {
+				// Sort by name only (alphabetical)
+				comparison = a.fullName.localeCompare(b.fullName, 'ko');
+			} else if (sortBy === 'number') {
+				// Sort by permanent number
+				comparison = a.permanentNumber - b.permanentNumber;
+			}
+
+			return sortOrder === 'asc' ? comparison : -comparison;
+		});
+
+		setFilteredStudents(sorted);
+	}, [searchTerm, students, sortBy, sortOrder]);
 
 	const fetchStudents = async () => {
 		try {
@@ -63,11 +111,22 @@ export default function Students() {
 		}
 	};
 
+	const handleSort = (column) => {
+		if (sortBy === column) {
+			// Toggle sort order if clicking the same column
+			setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+		} else {
+			// Set new sort column and reset to ascending
+			setSortBy(column);
+			setSortOrder('asc');
+		}
+	};
+
 	return (
 		<div className="flex h-screen bg-gray-50">
 			<Sidebar />
 			<main className="flex-1 overflow-y-auto">
-				<div className="p-6 sm:p-8 lg:pl-8 pt-16 lg:pt-6">
+				<div className="p-6 sm:p-8 lg:pl-8 pt-20 lg:pt-6">
 					{/* Header */}
 					<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
 						<div>
@@ -75,7 +134,7 @@ export default function Students() {
 						</div>
 						<button
 							onClick={() => setIsModalOpen(true)}
-							className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors shadow-sm hover:shadow-md"
+							className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors shadow-sm hover:shadow-md cursor-pointer"
 						>
 							<Plus className="w-5 h-5" />
 							<span>학생 추가</span>
@@ -140,29 +199,77 @@ export default function Students() {
 										<table className="w-full table-fixed">
 											<thead className="bg-gray-50 border-b border-gray-200">
 												<tr>
-													<th className="w-1/2 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-														이름
+													<th
+														onClick={() => handleSort('number')}
+														className="w-16 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors select-none"
+													>
+														<div className="flex items-center gap-1">
+															<span>#</span>
+															{sortBy === 'number' && (
+																<ArrowUpDown className={`w-3 h-3 ${sortOrder === 'desc' ? 'rotate-180' : ''}`} />
+															)}
+														</div>
 													</th>
-													<th className="w-1/4 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-														학년
+													<th
+														onClick={() => handleSort('name')}
+														className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors select-none"
+													>
+														<div className="flex items-center gap-1">
+															<span>이름 / 세례명</span>
+															{sortBy === 'name' && (
+																<ArrowUpDown className={`w-3 h-3 ${sortOrder === 'desc' ? 'rotate-180' : ''}`} />
+															)}
+														</div>
 													</th>
-													<th className="w-1/4 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+													<th
+														onClick={() => handleSort('grade')}
+														className="w-32 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors select-none"
+													>
+														<div className="flex items-center gap-1">
+															<span>학년</span>
+															{sortBy === 'grade' && (
+																<ArrowUpDown className={`w-3 h-3 ${sortOrder === 'desc' ? 'rotate-180' : ''}`} />
+															)}
+														</div>
+													</th>
+													<th
+														onClick={() => handleSort('nameDay')}
+														className="w-32 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors select-none"
+													>
+														<div className="flex items-center gap-1">
+															<span>축일 (월)</span>
+															{sortBy === 'nameDay' && (
+																<ArrowUpDown className={`w-3 h-3 ${sortOrder === 'desc' ? 'rotate-180' : ''}`} />
+															)}
+														</div>
+													</th>
+													<th className="w-24 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
 														성별
 													</th>
 												</tr>
 											</thead>
 											<tbody className="divide-y divide-gray-200">
-												{filteredStudents.map((student) => (
+												{filteredStudents.map((student, index) => (
 													<tr
 														key={student._id}
 														onClick={() => navigate(`/dashboard/students/${student._id}`)}
 														className="hover:bg-gray-50 transition-colors cursor-pointer"
 													>
 														<td className="px-6 py-3.5 whitespace-nowrap">
-															<div className="text-sm font-medium text-gray-900">{student.fullName}</div>
+															<div className="text-sm text-gray-500">{index + 1}</div>
+														</td>
+														<td className="px-6 py-3.5 whitespace-nowrap">
+															<div className="text-sm font-medium text-gray-900">
+																{student.fullName} {student.christianName}
+															</div>
 														</td>
 														<td className="px-6 py-3.5 whitespace-nowrap">
 															<div className="text-sm text-gray-700">{student.grade}</div>
+														</td>
+														<td className="px-6 py-3.5 whitespace-nowrap">
+															<div className="text-sm font-medium text-gray-900">
+																{student.nameDayMonth ? student.nameDayMonth : '-'}
+															</div>
 														</td>
 														<td className="px-6 py-3.5 whitespace-nowrap">
 															<div className="text-sm text-gray-700">{student.gender}</div>

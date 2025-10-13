@@ -5,7 +5,7 @@ const Student = require('../models/Student');
 // @access  Protected
 const createStudent = async (req, res) => {
 	try {
-		const { fullName, grade, gender } = req.body;
+		const { fullName, christianName, nameDayMonth, grade, gender, motherName, motherContact, fatherName, fatherContact } = req.body;
 
 		// Validation
 		if (!fullName || !grade || !gender) {
@@ -14,8 +14,14 @@ const createStudent = async (req, res) => {
 
 		const student = await Student.create({
 			fullName,
+			christianName,
+			nameDayMonth,
 			grade,
 			gender,
+			motherName,
+			motherContact,
+			fatherName,
+			fatherContact,
 		});
 
 		res.status(201).json(student);
@@ -58,7 +64,7 @@ const getStudentById = async (req, res) => {
 // @access  Protected
 const updateStudent = async (req, res) => {
 	try {
-		const { fullName, grade, gender } = req.body;
+		const { fullName, christianName, nameDayMonth, grade, gender, motherName, motherContact, fatherName, fatherContact } = req.body;
 
 		const student = await Student.findById(req.params.id);
 
@@ -67,8 +73,14 @@ const updateStudent = async (req, res) => {
 		}
 
 		student.fullName = fullName || student.fullName;
+		student.christianName = christianName !== undefined ? christianName : student.christianName;
+		student.nameDayMonth = nameDayMonth !== undefined ? nameDayMonth : student.nameDayMonth;
 		student.grade = grade || student.grade;
 		student.gender = gender || student.gender;
+		student.motherName = motherName !== undefined ? motherName : student.motherName;
+		student.motherContact = motherContact !== undefined ? motherContact : student.motherContact;
+		student.fatherName = fatherName !== undefined ? fatherName : student.fatherName;
+		student.fatherContact = fatherContact !== undefined ? fatherContact : student.fatherContact;
 
 		const updatedStudent = await student.save();
 

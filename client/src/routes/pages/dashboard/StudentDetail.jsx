@@ -162,6 +162,14 @@ export default function StudentDetail() {
 										<p className="text-base text-gray-900">{student.fullName}</p>
 									</div>
 									<div>
+										<label className="block text-sm font-medium text-gray-500 mb-1">세례명</label>
+										<p className="text-base text-gray-900">{student.christianName || '-'}</p>
+									</div>
+									<div>
+										<label className="block text-sm font-medium text-gray-500 mb-1">축일 (월)</label>
+										<p className="text-base text-gray-900">{student.nameDayMonth ? `${student.nameDayMonth}월` : '-'}</p>
+									</div>
+									<div>
 										<label className="block text-sm font-medium text-gray-500 mb-1">학년</label>
 										<p className="text-base text-gray-900">{student.grade}</p>
 									</div>
@@ -178,6 +186,29 @@ export default function StudentDetail() {
 												day: 'numeric',
 											})}
 										</p>
+									</div>
+								</div>
+							</div>
+
+							{/* Parent Information */}
+							<div className="border-t border-gray-200 p-6">
+								<h2 className="text-lg font-semibold text-gray-900 mb-4">부모님 정보</h2>
+								<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+									<div>
+										<label className="block text-sm font-medium text-gray-500 mb-1">어머니 성함</label>
+										<p className="text-base text-gray-900">{student.motherName || '-'}</p>
+									</div>
+									<div>
+										<label className="block text-sm font-medium text-gray-500 mb-1">어머니 연락처</label>
+										<p className="text-base text-gray-900">{student.motherContact || '-'}</p>
+									</div>
+									<div>
+										<label className="block text-sm font-medium text-gray-500 mb-1">아버지 성함</label>
+										<p className="text-base text-gray-900">{student.fatherName || '-'}</p>
+									</div>
+									<div>
+										<label className="block text-sm font-medium text-gray-500 mb-1">아버지 연락처</label>
+										<p className="text-base text-gray-900">{student.fatherContact || '-'}</p>
 									</div>
 								</div>
 							</div>

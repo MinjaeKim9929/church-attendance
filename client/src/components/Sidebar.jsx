@@ -52,15 +52,15 @@ export default function Sidebar() {
 			{/* Mobile Menu Button */}
 			<button
 				onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-				className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-md border border-gray-200 hover:bg-gray-50 transition-colors"
+				className="lg:hidden fixed top-4 left-4 z-50 p-2 mb-4 bg-white rounded-lg shadow-md border border-gray-200 hover:bg-gray-50 transition-colors"
 				aria-label="메뉴 토글"
 			>
 				{isMobileMenuOpen ? <X className="w-6 h-6 text-gray-700" /> : <Menu className="w-6 h-6 text-gray-700" />}
 			</button>
 
-			{/* Overlay for mobile */}
+			{/* Backdrop with blur for mobile */}
 			{isMobileMenuOpen && (
-				<div className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30" onClick={closeMobileMenu} />
+				<div className="lg:hidden fixed inset-0 backdrop-blur-sm bg-white/30 z-30" onClick={closeMobileMenu} />
 			)}
 
 			{/* Sidebar */}
@@ -70,7 +70,7 @@ export default function Sidebar() {
 				}`}
 			>
 				{/* Header */}
-				<div className="flex items-center gap-3 p-6 border-b border-gray-200">
+				<div className="flex items-center gap-3 p-6 pt-24 lg:pt-6 border-b border-gray-200">
 					<div className="flex items-center justify-center w-10 h-10 bg-blue-600 rounded-lg">
 						<svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path
