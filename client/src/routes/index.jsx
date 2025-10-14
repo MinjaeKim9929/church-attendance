@@ -6,6 +6,8 @@ import Signup from './pages/Signup';
 import Dashboard from './pages/dashboard/Dashboard';
 import Students from './pages/dashboard/students/Students';
 import StudentDetail from './pages/dashboard/students/StudentDetail';
+import Attendance from './pages/dashboard/attendance/Attendance';
+import Settings from './pages/dashboard/settings/Settings';
 import NotFound from './pages/NotFound';
 
 const router = createBrowserRouter([
@@ -35,6 +37,14 @@ const router = createBrowserRouter([
 			{
 				path: '/dashboard/students/:id',
 				element: <StudentDetail />,
+			},
+			{
+				path: '/dashboard/attendance',
+				element: <Attendance />,
+			},
+			{
+				path: '/dashboard/settings',
+				element: <Settings />,
 			},
 		],
 	},

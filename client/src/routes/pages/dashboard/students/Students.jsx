@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import axios from 'axios';
-import { Plus, Search, ArrowUpDown } from 'lucide-react';
+import { Plus, Search, ArrowUpDown, Edit2, Trash2 } from 'lucide-react';
 import AddStudentModal from '../../../../components/AddStudentModal';
+import DeleteConfirmModal from '../../../../components/DeleteConfirmModal';
 import Sidebar from '../../../../components/Sidebar';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
@@ -17,6 +18,9 @@ export default function Students() {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [sortBy, setSortBy] = useState('grade');
 	const [sortOrder, setSortOrder] = useState('asc'); // 'asc' or 'desc'
+	const [editingStudent, setEditingStudent] = useState(null);
+	const [deletingStudent, setDeletingStudent] = useState(null);
+	const [isDeleting, setIsDeleting] = useState(false);
 
 	// Grade order for sorting
 	const gradeOrder = ['JK', 'SK', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
@@ -113,6 +117,50 @@ export default function Students() {
 			setIsModalOpen(false);
 		} catch (err) {
 			throw new Error(err.response?.data?.message || '학생 추가에 실패했습니다');
+		}
+	};
+
+	const handleEditClick = (e, student) => {
+		e.stopPropagation();
+		setEditingStudent(student);
+	};
+
+	const handleEditSubmit = async (studentData) => {
+		try {
+			const response = await axios.put(`${API_URL}/students/${editingStudent._id}`, studentData, {
+				withCredentials: true,
+			});
+			setStudents(students.map((s) => (s._id === editingStudent._id ? response.data : s)));
+			setEditingStudent(null);
+		} catch (err) {
+			throw new Error(err.response?.data?.message || '학생 정보 수정에 실패했습니다');
+		}
+	};
+
+	const handleDeleteClick = (e, student) => {
+		e.stopPropagation();
+		setDeletingStudent(student);
+	};
+
+	const handleDeleteConfirm = async () => {
+		setIsDeleting(true);
+		try {
+			await axios.delete(`${API_URL}/students/${deletingStudent._id}`, {
+				withCredentials: true,
+			});
+			setStudents(students.filter((s) => s._id !== deletingStudent._id));
+			setDeletingStudent(null);
+		} catch (err) {
+			setError(err.response?.data?.message || '학생 삭제에 실패했습니다');
+			setDeletingStudent(null);
+		} finally {
+			setIsDeleting(false);
+		}
+	};
+
+	const handleDeleteCancel = () => {
+		if (!isDeleting) {
+			setDeletingStudent(null);
 		}
 	};
 
@@ -271,6 +319,9 @@ export default function Students() {
 														<th className="w-24 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
 															성별
 														</th>
+														<th className="w-32 px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+															관리
+														</th>
 													</tr>
 												</thead>
 												<tbody className="divide-y divide-gray-200">
@@ -298,6 +349,24 @@ export default function Students() {
 															</td>
 															<td className="px-6 py-3.5 whitespace-nowrap">
 																<div className="text-sm text-gray-700">{student.gender}</div>
+															</td>
+														<td className="px-6 py-3.5 whitespace-nowrap">
+																<div className="flex items-center justify-center gap-2">
+																	<button
+																		onClick={(e) => handleEditClick(e, student)}
+																		className="p-1.5 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+																		title="수정"
+																	>
+																		<Edit2 className="w-4 h-4" />
+																	</button>
+																	<button
+																		onClick={(e) => handleDeleteClick(e, student)}
+																		className="p-1.5 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+																		title="삭제"
+																	>
+																		<Trash2 className="w-4 h-4" />
+																	</button>
+																</div>
 															</td>
 														</tr>
 													))}
@@ -330,17 +399,35 @@ export default function Students() {
 														{student.grade}
 													</span>
 												</div>
-												<div className="flex items-center gap-4 text-sm text-gray-600 ml-8">
-													<div className="flex items-center gap-1">
-														<span className="font-medium">성별:</span>
-														<span>{student.gender}</span>
-													</div>
-													{student.nameDayMonth && (
+													<div className="flex items-center justify-between text-sm text-gray-600 ml-8">
+													<div className="flex items-center gap-4">
 														<div className="flex items-center gap-1">
-															<span className="font-medium">축일:</span>
-															<span>{student.nameDayMonth}월</span>
+															<span className="font-medium">성별:</span>
+															<span>{student.gender}</span>
 														</div>
-													)}
+														{student.nameDayMonth && (
+															<div className="flex items-center gap-1">
+																<span className="font-medium">축일:</span>
+																<span>{student.nameDayMonth}월</span>
+															</div>
+														)}
+													</div>
+													<div className="flex items-center gap-1">
+														<button
+															onClick={(e) => handleEditClick(e, student)}
+															className="p-1.5 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+															title="수정"
+														>
+															<Edit2 className="w-4 h-4" />
+														</button>
+														<button
+															onClick={(e) => handleDeleteClick(e, student)}
+															className="p-1.5 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+															title="삭제"
+														>
+															<Trash2 className="w-4 h-4" />
+														</button>
+													</div>
 												</div>
 											</div>
 										))}
@@ -354,6 +441,21 @@ export default function Students() {
 
 			{/* Add Student Modal */}
 			{isModalOpen && <AddStudentModal onClose={() => setIsModalOpen(false)} onSubmit={handleAddStudent} />}
+
+			{/* Edit Student Modal */}
+			{editingStudent && (
+				<AddStudentModal student={editingStudent} onClose={() => setEditingStudent(null)} onSubmit={handleEditSubmit} />
+			)}
+
+			{/* Delete Confirmation Modal */}
+			<DeleteConfirmModal
+				isOpen={!!deletingStudent}
+				onClose={handleDeleteCancel}
+				onConfirm={handleDeleteConfirm}
+				title="학생 삭제"
+				message={`${deletingStudent?.fullName} 학생을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`}
+				isDeleting={isDeleting}
+			/>
 		</div>
 	);
 }
