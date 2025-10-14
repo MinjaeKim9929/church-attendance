@@ -4,8 +4,8 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/dashboard/Dashboard';
-import Students from './pages/dashboard/Students';
-import StudentDetail from './pages/dashboard/StudentDetail';
+import Students from './pages/dashboard/students/Students';
+import StudentDetail from './pages/dashboard/students/StudentDetail';
 import NotFound from './pages/NotFound';
 
 const router = createBrowserRouter([

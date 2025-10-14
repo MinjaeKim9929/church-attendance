@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import axios from 'axios';
 import { ArrowLeft, Edit2, Trash2 } from 'lucide-react';
-import Sidebar from '../../../components/Sidebar';
-import DeleteConfirmModal from '../../../components/DeleteConfirmModal';
+import Sidebar from '../../../../components/Sidebar';
+import DeleteConfirmModal from '../../../../components/DeleteConfirmModal';
+import AddStudentModal from '../../../../components/AddStudentModal';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
@@ -16,6 +17,7 @@ export default function StudentDetail() {
 	const [error, setError] = useState('');
 	const [deleteModal, setDeleteModal] = useState(false);
 	const [isDeleting, setIsDeleting] = useState(false);
+	const [editModal, setEditModal] = useState(false);
 
 	useEffect(() => {
 		fetchStudent();
@@ -33,6 +35,22 @@ export default function StudentDetail() {
 			setError(err.response?.data?.message || '학생 정보를 불러오는데 실패했습니다');
 		} finally {
 			setIsLoading(false);
+		}
+	};
+
+	const handleEditClick = () => {
+		setEditModal(true);
+	};
+
+	const handleEditSubmit = async (studentData) => {
+		try {
+			const response = await axios.put(`${API_URL}/students/${id}`, studentData, {
+				withCredentials: true,
+			});
+			setStudent(response.data);
+			setEditModal(false);
+		} catch (err) {
+			throw new Error(err.response?.data?.message || '학생 정보 수정에 실패했습니다');
 		}
 	};
 
@@ -104,7 +122,7 @@ export default function StudentDetail() {
 		<div className="flex h-screen bg-gray-50">
 			<Sidebar />
 			<main className="flex-1 overflow-y-auto">
-				<div className="p-6 sm:p-8 lg:pl-8 pt-16 lg:pt-6">
+				<div className="p-6 sm:p-8 lg:pl-8 pt-18 lg:pt-6">
 					{/* Back Button */}
 					<div className="mb-6">
 						<button
@@ -134,9 +152,7 @@ export default function StudentDetail() {
 									</div>
 									<div className="flex items-center gap-2">
 										<button
-											onClick={() => {
-												/* TODO: Edit functionality */
-											}}
+											onClick={handleEditClick}
 											className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
 										>
 											<Edit2 className="w-4 h-4" />
@@ -167,7 +183,9 @@ export default function StudentDetail() {
 									</div>
 									<div>
 										<label className="block text-sm font-medium text-gray-500 mb-1">축일 (월)</label>
-										<p className="text-base text-gray-900">{student.nameDayMonth ? `${student.nameDayMonth}월` : '-'}</p>
+										<p className="text-base text-gray-900">
+											{student.nameDayMonth ? `${student.nameDayMonth}월` : '-'}
+										</p>
 									</div>
 									<div>
 										<label className="block text-sm font-medium text-gray-500 mb-1">학년</label>
@@ -224,6 +242,11 @@ export default function StudentDetail() {
 					)}
 				</div>
 			</main>
+
+			{/* Edit Student Modal */}
+			{editModal && student && (
+				<AddStudentModal student={student} onClose={() => setEditModal(false)} onSubmit={handleEditSubmit} />
+			)}
 
 			{/* Delete Confirmation Modal */}
 			<DeleteConfirmModal

@@ -1,17 +1,18 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
 
-export default function AddStudentModal({ onClose, onSubmit }) {
+export default function AddStudentModal({ onClose, onSubmit, student = null }) {
+	const isEditMode = !!student;
 	const [formData, setFormData] = useState({
-		fullName: '',
-		christianName: '',
-		nameDayMonth: '',
-		grade: '',
-		gender: '',
-		motherName: '',
-		motherContact: '',
-		fatherName: '',
-		fatherContact: '',
+		fullName: student?.fullName || '',
+		christianName: student?.christianName || '',
+		nameDayMonth: student?.nameDayMonth || '',
+		grade: student?.grade || '',
+		gender: student?.gender || '',
+		motherName: student?.motherName || '',
+		motherContact: student?.motherContact || '',
+		fatherName: student?.fatherName || '',
+		fatherContact: student?.fatherContact || '',
 	});
 	const [errors, setErrors] = useState({});
 	const [isSubmitting, setIsSubmitting] = useState(false);
@@ -94,7 +95,7 @@ export default function AddStudentModal({ onClose, onSubmit }) {
 				<div className="relative bg-white rounded-lg shadow-xl w-full max-w-md lg:max-w-3xl transform transition-all">
 					{/* Header */}
 					<div className="flex items-center justify-between p-6 border-b border-gray-200">
-						<h2 className="text-xl font-semibold text-gray-900">새 학생 추가</h2>
+						<h2 className="text-xl font-semibold text-gray-900">{isEditMode ? '학생 정보 수정' : '새 학생 추가'}</h2>
 						<button
 							onClick={onClose}
 							className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
@@ -322,7 +323,7 @@ export default function AddStudentModal({ onClose, onSubmit }) {
 								disabled={isSubmitting}
 								className="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors shadow-sm hover:shadow-md disabled:bg-blue-400 disabled:cursor-not-allowed cursor-pointer"
 							>
-								{isSubmitting ? '추가 중...' : '학생 추가'}
+								{isEditMode ? (isSubmitting ? '수정 중...' : '수정 완료') : (isSubmitting ? '추가 중...' : '학생 추가')}
 							</button>
 						</div>
 					</form>

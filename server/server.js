@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 const connectDB = require('./lib/db.js');
 const userRoutes = require('./routes/userRoutes.js');
 const studentRoutes = require('./routes/studentRoutes.js');
+const attendanceRoutes = require('./routes/attendanceRoutes.js');
 
 dotenv.config();
 
@@ -31,6 +32,7 @@ app.use(cookieParser());
 // Router setup
 app.use('/api/auth', userRoutes);
 app.use('/api/students', studentRoutes);
+app.use('/api/attendance', attendanceRoutes);
 
 app.use((err, req, res, next) => {
 	console.error(err.stack);
