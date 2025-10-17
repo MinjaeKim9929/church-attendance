@@ -5,8 +5,12 @@ const protect = async (req, res, next) => {
 	try {
 		let token;
 
-		// Check for token in cookies
-		if (req.cookies.jwt) {
+		// Check for token in Authorization header first (better for cross-origin)
+		if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+			token = req.headers.authorization.substring(7); // Remove 'Bearer ' prefix
+		}
+		// Fallback to cookie (for backwards compatibility)
+		else if (req.cookies.jwt) {
 			token = req.cookies.jwt;
 		}
 

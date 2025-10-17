@@ -10,6 +10,20 @@ if (!API_URL.endsWith('/api')) {
 axios.defaults.baseURL = API_URL;
 axios.defaults.withCredentials = true;
 
+// Set up axios interceptor to add Authorization header
+axios.interceptors.request.use(
+	(config) => {
+		const token = localStorage.getItem('token');
+		if (token) {
+			config.headers.Authorization = `Bearer ${token}`;
+		}
+		return config;
+	},
+	(error) => {
+		return Promise.reject(error);
+	}
+);
+
 export const AuthProvider = ({ children }) => {
 	const [user, setUser] = useState(null);
 	const [isLoading, setIsLoading] = useState(true);
@@ -41,7 +55,10 @@ export const AuthProvider = ({ children }) => {
 			const response = await axios.post('/auth/signup', userData);
 			const data = response.data;
 
-			// Store user data
+			// Store token and user data
+			if (data.token) {
+				localStorage.setItem('token', data.token);
+			}
 			setUser(data);
 			localStorage.setItem('user', JSON.stringify(data));
 
@@ -64,7 +81,10 @@ export const AuthProvider = ({ children }) => {
 			const response = await axios.post('/auth/login', credentials);
 			const data = response.data;
 
-			// Store user data
+			// Store token and user data
+			if (data.token) {
+				localStorage.setItem('token', data.token);
+			}
 			setUser(data);
 			localStorage.setItem('user', JSON.stringify(data));
 
@@ -84,11 +104,13 @@ export const AuthProvider = ({ children }) => {
 			await axios.post('/auth/logout');
 
 			setUser(null);
+			localStorage.removeItem('token');
 			localStorage.removeItem('user');
 			sessionStorage.removeItem('user');
 		} catch (err) {
 			console.error('Logout error:', err);
 			setUser(null);
+			localStorage.removeItem('token');
 			localStorage.removeItem('user');
 			sessionStorage.removeItem('user');
 		}
