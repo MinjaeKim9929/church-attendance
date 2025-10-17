@@ -19,7 +19,7 @@ connectDB();
 
 // CORS configuration
 const corsOptions = {
-	origin: 'http://localhost:5173',
+	origin: ['http://localhost:5173', 'https://standrewkimlondon.pages.dev'],
 	credentials: true,
 	optionsSuccessStatus: 200,
 };
