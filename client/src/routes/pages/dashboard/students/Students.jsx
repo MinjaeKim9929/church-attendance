@@ -5,6 +5,7 @@ import { Plus, Search, ArrowUpDown, Edit2, Trash2 } from 'lucide-react';
 import AddStudentModal from '../../../../components/AddStudentModal';
 import DeleteConfirmModal from '../../../../components/DeleteConfirmModal';
 import Sidebar from '../../../../components/Sidebar';
+import Toast from '../../../../components/Toast';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
@@ -13,7 +14,6 @@ export default function Students() {
 	const [students, setStudents] = useState([]);
 	const [filteredStudents, setFilteredStudents] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
-	const [error, setError] = useState('');
 	const [searchTerm, setSearchTerm] = useState('');
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [sortBy, setSortBy] = useState('grade');
@@ -21,6 +21,7 @@ export default function Students() {
 	const [editingStudent, setEditingStudent] = useState(null);
 	const [deletingStudent, setDeletingStudent] = useState(null);
 	const [isDeleting, setIsDeleting] = useState(false);
+	const [toast, setToast] = useState(null);
 
 	// Grade order for sorting
 	const gradeOrder = ['JK', 'SK', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
@@ -95,14 +96,16 @@ export default function Students() {
 	const fetchStudents = async () => {
 		try {
 			setIsLoading(true);
-			setError('');
 			const response = await axios.get(`${API_URL}/students`, {
 				withCredentials: true,
 			});
 			setStudents(response.data);
 			setFilteredStudents(response.data);
 		} catch (err) {
-			setError(err.response?.data?.message || '학생 목록을 불러오는데 실패했습니다');
+			setToast({
+				message: err.response?.data?.message || '학생 목록을 불러오는데 실패했습니다',
+				type: 'error',
+			});
 		} finally {
 			setIsLoading(false);
 		}
@@ -115,6 +118,10 @@ export default function Students() {
 			});
 			setStudents([response.data, ...students]);
 			setIsModalOpen(false);
+			setToast({
+				message: '학생이 성공적으로 추가되었습니다!',
+				type: 'success',
+			});
 		} catch (err) {
 			throw new Error(err.response?.data?.message || '학생 추가에 실패했습니다');
 		}
@@ -132,6 +139,10 @@ export default function Students() {
 			});
 			setStudents(students.map((s) => (s._id === editingStudent._id ? response.data : s)));
 			setEditingStudent(null);
+			setToast({
+				message: '학생 정보가 성공적으로 수정되었습니다!',
+				type: 'success',
+			});
 		} catch (err) {
 			throw new Error(err.response?.data?.message || '학생 정보 수정에 실패했습니다');
 		}
@@ -150,8 +161,15 @@ export default function Students() {
 			});
 			setStudents(students.filter((s) => s._id !== deletingStudent._id));
 			setDeletingStudent(null);
+			setToast({
+				message: '학생이 성공적으로 삭제되었습니다.',
+				type: 'success',
+			});
 		} catch (err) {
-			setError(err.response?.data?.message || '학생 삭제에 실패했습니다');
+			setToast({
+				message: err.response?.data?.message || '학생 삭제에 실패했습니다',
+				type: 'error',
+			});
 			setDeletingStudent(null);
 		} finally {
 			setIsDeleting(false);
@@ -208,11 +226,9 @@ export default function Students() {
 						</div>
 					</div>
 
-					{/* Error Message */}
-					{error && (
-						<div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-							<p className="text-sm text-red-600">{error}</p>
-						</div>
+					{/* Toast Notification */}
+					{toast && (
+						<Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} duration={3000} />
 					)}
 
 					{/* Loading State */}

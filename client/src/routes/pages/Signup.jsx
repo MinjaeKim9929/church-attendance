@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { useAuth } from '../../context/useAuth';
+import Toast from '../../components/Toast';
 
 export default function SignUpPage() {
 	const { user, signup, isLoading: authLoading, error: authError, clearError } = useAuth();
@@ -12,6 +13,7 @@ export default function SignUpPage() {
 	const [confirmPassword, setConfirmPassword] = useState('');
 	const [errors, setErrors] = useState({ fullName: '', email: '', password: '', confirmPassword: '' });
 	const [touched, setTouched] = useState({ fullName: false, email: false, password: false, confirmPassword: false });
+	const [toast, setToast] = useState(null);
 
 	const validateEmail = (email) => {
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -78,9 +80,17 @@ export default function SignUpPage() {
 		if (!newErrors.fullName && !newErrors.email && !newErrors.password && !newErrors.confirmPassword) {
 			try {
 				await signup({ fullName, email, password });
-				navigate('/dashboard');
+				setToast({
+					message: '회원가입 성공! 대시보드로 이동합니다.',
+					type: 'success',
+				});
+				setTimeout(() => navigate('/dashboard'), 500);
 			} catch (error) {
 				console.error('Signup error:', error);
+				setToast({
+					message: error.message || '회원가입에 실패했습니다.',
+					type: 'error',
+				});
 			}
 		}
 	};
@@ -159,11 +169,9 @@ export default function SignUpPage() {
 						<h1 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">Create Account</h1>
 					</div>
 
-					{/* API Error Message */}
-					{authError && (
-						<div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-							<p className="text-sm text-red-600">{authError}</p>
-						</div>
+					{/* Toast Notification */}
+					{toast && (
+						<Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} duration={3000} />
 					)}
 
 					{/* Form */}

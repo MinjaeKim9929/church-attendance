@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { EyeClosed, Eye } from 'lucide-react';
 import { useAuth } from '../../context/useAuth';
 import { useNavigate } from 'react-router';
+import Toast from '../../components/Toast';
 
 export default function Login() {
 	const { user, login, isLoading: authLoading, error: authError, clearError } = useAuth();
@@ -12,6 +13,7 @@ export default function Login() {
 	const [showPassword, setShowPassword] = useState(false);
 	const [rememberMe, setRememberMe] = useState(false);
 	const [errors, setErrors] = useState({ email: '', password: '' });
+	const [toast, setToast] = useState(null);
 
 	const validateEmail = (email) => {
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -63,9 +65,17 @@ export default function Login() {
 			console.log('Login attempt: ', { email, password });
 			try {
 				await login({ email, password, rememberMe });
-				navigate('/dashboard');
+				setToast({
+					message: '로그인 성공! 대시보드로 이동합니다.',
+					type: 'success',
+				});
+				setTimeout(() => navigate('/dashboard'), 500);
 			} catch (error) {
 				console.error('Login error:', error);
+				setToast({
+					message: error.message || '로그인에 실패했습니다.',
+					type: 'error',
+				});
 			}
 		}
 	};
@@ -111,10 +121,9 @@ export default function Login() {
 						<p className="text-gray-600 text-xs sm:text-sm">로그인하여 계정에 접속하세요</p>
 					</div>
 
-					{authError && (
-						<div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-							<p className="text-sm text-red-600">{authError}</p>
-						</div>
+					{/* Toast Notification */}
+					{toast && (
+						<Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} duration={3000} />
 					)}
 
 					{/* Form */}

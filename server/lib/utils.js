@@ -15,14 +15,40 @@ const generateToken = (userId, res, rememberMe = false) => {
 	return token;
 };
 
-// Helper function to calculate class from grade
-const getClassFromGrade = (grade) => {
-	if (['JK', 'SK', '1'].includes(grade)) return 'JK-Gr1';
-	if (['2', '3', '4'].includes(grade)) return 'Gr2-4';
-	if (['5', '6'].includes(grade)) return 'Gr5-6';
-	if (['7', '8'].includes(grade)) return 'Gr7-8';
-	if (['9', '10', '11', '12'].includes(grade)) return 'HighSchool';
+// Helper function to calculate school year from date
+// School year runs from Sept 1 to Aug 31
+// Returns format: "25_26" for 2025-2026 school year
+const getSchoolYearFromDate = (date = new Date()) => {
+	const d = new Date(date);
+	const month = d.getMonth(); // 0-11
+	const year = d.getFullYear();
+
+	// If month is Sept (8) or later, school year starts this year
+	// If month is before Sept (0-7), school year started last year
+	const startYear = month >= 8 ? year : year - 1;
+	const endYear = startYear + 1;
+
+	// Format: "25_26" from years 2025-2026
+	const startYearShort = startYear.toString().slice(-2);
+	const endYearShort = endYear.toString().slice(-2);
+
+	return `${startYearShort}_${endYearShort}`;
+};
+
+// Helper function to find student's class based on grade and class configuration
+// This will be used by attendance controller after fetching ClassConfiguration
+const getClassFromGradeAndConfig = (grade, classConfiguration) => {
+	if (!classConfiguration || !classConfiguration.classes) {
+		return null;
+	}
+
+	for (const classInfo of classConfiguration.classes) {
+		if (classInfo.grades.includes(grade)) {
+			return classInfo.className;
+		}
+	}
+
 	return null;
 };
 
-module.exports = { generateToken, getClassFromGrade };
+module.exports = { generateToken, getSchoolYearFromDate, getClassFromGradeAndConfig };

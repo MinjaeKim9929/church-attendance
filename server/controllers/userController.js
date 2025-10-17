@@ -130,4 +130,117 @@ const checkAuth = async (req, res) => {
 	}
 };
 
-module.exports = { signup, login, logout, checkAuth };
+// @desc    Get user settings
+// @route   GET /api/settings
+// @access  Protected
+const getSettings = async (req, res) => {
+	try {
+		const user = await User.findById(req.user._id).select('-password');
+
+		if (!user) {
+			return res.status(404).json({ message: 'User not found' });
+		}
+
+		res.status(200).json({
+			_id: user._id,
+			fullName: user.fullName,
+			email: user.email,
+			role: user.role,
+			assignedClassIndex: user.assignedClassIndex,
+			phone: user.phone,
+			preferences: user.preferences,
+			isActive: user.isActive,
+			createdAt: user.createdAt,
+			updatedAt: user.updatedAt,
+		});
+	} catch (error) {
+		console.error('Error in getSettings controller:', error.message);
+		res.status(500).json({ message: 'Internal server error' });
+	}
+};
+
+// @desc    Update user settings
+// @route   PUT /api/settings
+// @access  Protected
+const updateSettings = async (req, res) => {
+	try {
+		const { fullName, phone, preferences, assignedClassIndex } = req.body;
+
+		const user = await User.findById(req.user._id);
+
+		if (!user) {
+			return res.status(404).json({ message: 'User not found' });
+		}
+
+		// Update fields if provided
+		if (fullName !== undefined) user.fullName = fullName;
+		if (phone !== undefined) user.phone = phone;
+		if (assignedClassIndex !== undefined) user.assignedClassIndex = assignedClassIndex;
+
+		// Update preferences
+		if (preferences) {
+			if (preferences.theme !== undefined) user.preferences.theme = preferences.theme;
+			if (preferences.language !== undefined) user.preferences.language = preferences.language;
+		}
+
+		const updatedUser = await user.save();
+
+		res.status(200).json({
+			_id: updatedUser._id,
+			fullName: updatedUser.fullName,
+			email: updatedUser.email,
+			role: updatedUser.role,
+			assignedClassIndex: updatedUser.assignedClassIndex,
+			phone: updatedUser.phone,
+			preferences: updatedUser.preferences,
+			isActive: updatedUser.isActive,
+		});
+	} catch (error) {
+		console.error('Error in updateSettings controller:', error.message);
+		res.status(500).json({ message: 'Internal server error' });
+	}
+};
+
+// @desc    Update user password
+// @route   PUT /api/settings/password
+// @access  Protected
+const updatePassword = async (req, res) => {
+	try {
+		const { currentPassword, newPassword } = req.body;
+
+		// Validation
+		if (!currentPassword || !newPassword) {
+			return res.status(400).json({ message: 'Please provide current and new password' });
+		}
+
+		if (newPassword.length < 8) {
+			return res.status(400).json({ message: 'New password must be at least 8 characters long' });
+		}
+
+		const user = await User.findById(req.user._id);
+
+		if (!user) {
+			return res.status(404).json({ message: 'User not found' });
+		}
+
+		// Check current password
+		const isPasswordCorrect = await bcrypt.compare(currentPassword, user.password);
+		if (!isPasswordCorrect) {
+			return res.status(400).json({ message: 'Current password is incorrect' });
+		}
+
+		// Hash new password
+		const salt = await bcrypt.genSalt(12);
+		const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+		user.password = hashedPassword;
+		await user.save();
+
+		res.status(200).json({ message: 'Password updated successfully' });
+	} catch (error) {
+		console.error('Error in updatePassword controller:', error.message);
+		res.status(500).json({ message: 'Internal server error' });
+	}
+};
+
+module.exports = { signup, login, logout, checkAuth, getSettings, updateSettings, updatePassword };

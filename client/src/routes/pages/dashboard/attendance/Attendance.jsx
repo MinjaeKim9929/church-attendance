@@ -10,6 +10,7 @@ export default function Attendance() {
 			id: 'all',
 			name: '전체 학생',
 			grades: ['JK', 'SK', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
+			description: '모든 학년',
 			color: 'bg-gray-50 border-gray-300 hover:bg-gray-100',
 			iconColor: 'bg-gray-100 text-gray-700',
 			isAll: true,
@@ -24,22 +25,25 @@ export default function Attendance() {
 		},
 		{
 			id: 'class2',
-			name: '2 - 4학년',
+			name: '2-4학년',
 			grades: ['2', '3', '4'],
+			description: '2, 3, 4학년',
 			color: 'bg-blue-50 border-blue-200 hover:bg-blue-100',
 			iconColor: 'bg-blue-100 text-blue-600',
 		},
 		{
 			id: 'class3',
-			name: '5 - 6학년',
+			name: '5-6학년',
 			grades: ['5', '6'],
+			description: '5, 6학년',
 			color: 'bg-green-50 border-green-200 hover:bg-green-100',
 			iconColor: 'bg-green-100 text-green-600',
 		},
 		{
 			id: 'class4',
-			name: '7 - 8학년',
+			name: '7-8학년',
 			grades: ['7', '8'],
+			description: '7, 8학년',
 			color: 'bg-purple-50 border-purple-200 hover:bg-purple-100',
 			iconColor: 'bg-purple-100 text-purple-600',
 		},
@@ -94,9 +98,7 @@ export default function Attendance() {
 										<h3 className="text-base sm:text-xl font-bold text-gray-900 mb-1 sm:mb-2 group-hover:text-gray-900 transition-colors leading-tight">
 											{classInfo.name}
 										</h3>
-										{classInfo.description && (
-											<p className="text-xs sm:text-sm text-gray-600 leading-relaxed">{classInfo.description}</p>
-										)}
+										<p className="text-xs sm:text-sm text-gray-600 leading-relaxed">{classInfo.description}</p>
 									</div>
 								</div>
 							</div>

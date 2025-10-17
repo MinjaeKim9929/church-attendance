@@ -1,38 +1,50 @@
 const mongoose = require('mongoose');
 
-const attendanceSchema = new mongoose.Schema(
-	{
-		studentId: {
-			type: mongoose.Schema.Types.ObjectId,
-			ref: 'Student',
-			required: true,
-		},
-		date: {
-			type: Date,
-			required: true,
-		},
-		class: {
-			type: String,
-			required: true,
-			enum: ['JK-Gr1', 'Gr2-4', 'Gr5-6', 'Gr7-8', 'HighSchool'],
-		},
-		status: {
-			type: String,
-			required: true,
-			enum: ['Present', 'Absent'],
-		},
-		recordedBy: {
-			type: mongoose.Schema.Types.ObjectId,
-			ref: 'User',
-			required: true,
-		},
-	},
-	{ timestamps: true }
-);
+// Factory function to get Attendance model for a specific school year
+// This creates dynamic collections like: attendances_25_26, attendances_26_27, etc.
+const getAttendanceModel = (schoolYear) => {
+	const collectionName = `attendances_${schoolYear}`;
 
-// Create compound index to ensure one attendance record per student per date
-attendanceSchema.index({ studentId: 1, date: 1 }, { unique: true });
+	// Check if model already exists to avoid OverwriteModelError
+	if (mongoose.models[collectionName]) {
+		return mongoose.models[collectionName];
+	}
 
-const Attendance = mongoose.model('Attendance', attendanceSchema);
+	const attendanceSchema = new mongoose.Schema(
+		{
+			studentId: {
+				type: mongoose.Schema.Types.ObjectId,
+				ref: 'Student',
+				required: true,
+			},
+			date: {
+				type: Date,
+				required: true,
+			},
+			class: {
+				type: String,
+				required: true,
+				// No enum since classes are dynamic per year
+			},
+			status: {
+				type: String,
+				required: true,
+				enum: ['Present', 'Absent'],
+			},
+			recordedBy: {
+				type: mongoose.Schema.Types.ObjectId,
+				ref: 'User',
+				required: true,
+			},
+		},
+		{ timestamps: true }
+	);
 
-module.exports = Attendance;
+	// Create compound index to ensure one attendance record per student per date
+	attendanceSchema.index({ studentId: 1, date: 1 }, { unique: true });
+
+	// Create model with dynamic collection name
+	return mongoose.model(collectionName, attendanceSchema, collectionName);
+};
+
+module.exports = getAttendanceModel;

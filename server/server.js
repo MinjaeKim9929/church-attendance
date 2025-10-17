@@ -8,6 +8,7 @@ const connectDB = require('./lib/db.js');
 const userRoutes = require('./routes/userRoutes.js');
 const studentRoutes = require('./routes/studentRoutes.js');
 const attendanceRoutes = require('./routes/attendanceRoutes.js');
+const classConfigurationRoutes = require('./routes/classConfigurationRoutes.js');
 
 dotenv.config();
 
@@ -33,6 +34,7 @@ app.use(cookieParser());
 app.use('/api/auth', userRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/attendance', attendanceRoutes);
+app.use('/api/class-config', classConfigurationRoutes);
 
 app.use((err, req, res, next) => {
 	console.error(err.stack);

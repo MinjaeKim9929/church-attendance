@@ -1,29 +1,42 @@
-const Attendance = require('../models/Attendance');
+const getAttendanceModel = require('../models/Attendance');
 const Student = require('../models/Student');
-const { getClassFromGrade } = require('../lib/utils');
+const ClassConfiguration = require('../models/ClassConfiguration');
+const { getSchoolYearFromDate, getClassFromGradeAndConfig } = require('../lib/utils');
 
 // @desc    Create a single attendance record
 // @route   POST /api/attendance
 // @access  Protected
 const createAttendance = async (req, res) => {
 	try {
-		const { studentId, date, status } = req.body;
+		const { studentId, date, status, schoolYear } = req.body;
 
 		// Validation
 		if (!studentId || !date || !status) {
 			return res.status(400).json({ message: 'Please provide all required fields' });
 		}
 
-		// Get student to calculate class
+		// Determine school year (use provided or auto-calculate)
+		const year = schoolYear || getSchoolYearFromDate(new Date(date));
+
+		// Get the Attendance model for this school year
+		const Attendance = getAttendanceModel(year);
+
+		// Get student to determine class
 		const student = await Student.findById(studentId);
 		if (!student) {
 			return res.status(404).json({ message: 'Student not found' });
 		}
 
-		// Calculate class from student's grade
-		const studentClass = getClassFromGrade(student.grade);
+		// Get class configuration for this school year
+		const classConfig = await ClassConfiguration.findOne({ schoolYear: year });
+		if (!classConfig) {
+			return res.status(404).json({ message: `No class configuration found for school year ${year}. Please set up classes first.` });
+		}
+
+		// Calculate class from student's grade using configuration
+		const studentClass = getClassFromGradeAndConfig(student.grade, classConfig);
 		if (!studentClass) {
-			return res.status(400).json({ message: 'Invalid grade for class calculation' });
+			return res.status(400).json({ message: `Student's grade (${student.grade}) is not assigned to any class for year ${year}` });
 		}
 
 		// Create attendance record
@@ -54,12 +67,24 @@ const createAttendance = async (req, res) => {
 // @access  Protected
 const bulkCreateAttendance = async (req, res) => {
 	try {
-		const { date, attendanceRecords } = req.body;
+		const { date, attendanceRecords, schoolYear } = req.body;
 		// attendanceRecords format: [{ studentId, status }, { studentId, status }, ...]
 
 		// Validation
 		if (!date || !attendanceRecords || !Array.isArray(attendanceRecords)) {
 			return res.status(400).json({ message: 'Please provide date and attendance records array' });
+		}
+
+		// Determine school year (use provided or auto-calculate)
+		const year = schoolYear || getSchoolYearFromDate(new Date(date));
+
+		// Get the Attendance model for this school year
+		const Attendance = getAttendanceModel(year);
+
+		// Get class configuration for this school year
+		const classConfig = await ClassConfiguration.findOne({ schoolYear: year });
+		if (!classConfig) {
+			return res.status(404).json({ message: `No class configuration found for school year ${year}. Please set up classes first.` });
 		}
 
 		const results = {
@@ -85,10 +110,10 @@ const bulkCreateAttendance = async (req, res) => {
 					continue;
 				}
 
-				// Calculate class from student's grade
-				const studentClass = getClassFromGrade(student.grade);
+				// Calculate class from student's grade using configuration
+				const studentClass = getClassFromGradeAndConfig(student.grade, classConfig);
 				if (!studentClass) {
-					results.errors.push({ studentId, message: 'Invalid grade for class calculation' });
+					results.errors.push({ studentId, message: `Student's grade (${student.grade}) not assigned to any class` });
 					continue;
 				}
 
@@ -127,6 +152,7 @@ const bulkCreateAttendance = async (req, res) => {
 
 		res.status(200).json({
 			message: 'Bulk attendance processed',
+			schoolYear: year,
 			results,
 		});
 	} catch (err) {
@@ -140,11 +166,24 @@ const bulkCreateAttendance = async (req, res) => {
 const getAttendanceByClassAndDate = async (req, res) => {
 	try {
 		const { className, date } = req.params;
+		const { schoolYear } = req.query;
 
-		// Get all students in this class
+		// Determine school year (use provided or auto-calculate)
+		const year = schoolYear || getSchoolYearFromDate(new Date(date));
+
+		// Get the Attendance model for this school year
+		const Attendance = getAttendanceModel(year);
+
+		// Get class configuration for this school year
+		const classConfig = await ClassConfiguration.findOne({ schoolYear: year });
+		if (!classConfig) {
+			return res.status(404).json({ message: `No class configuration found for school year ${year}` });
+		}
+
+		// Get all students in this class based on configuration
 		const students = await Student.find();
 		const classStudents = students.filter((student) => {
-			return getClassFromGrade(student.grade) === className;
+			return getClassFromGradeAndConfig(student.grade, classConfig) === className;
 		});
 
 		// Get attendance records for this date
@@ -176,6 +215,7 @@ const getAttendanceByClassAndDate = async (req, res) => {
 		});
 
 		res.status(200).json({
+			schoolYear: year,
 			class: className,
 			date,
 			students: response,
@@ -191,13 +231,23 @@ const getAttendanceByClassAndDate = async (req, res) => {
 const getAttendanceByClass = async (req, res) => {
 	try {
 		const { className } = req.params;
+		const { schoolYear } = req.query;
+
+		// Determine school year (use provided or auto-calculate)
+		const year = schoolYear || getSchoolYearFromDate();
+
+		// Get the Attendance model for this school year
+		const Attendance = getAttendanceModel(year);
 
 		const attendanceRecords = await Attendance.find({ class: className })
 			.populate('studentId', 'fullName grade gender')
 			.populate('recordedBy', 'fullName email')
 			.sort({ date: -1 });
 
-		res.status(200).json(attendanceRecords);
+		res.status(200).json({
+			schoolYear: year,
+			attendanceRecords,
+		});
 	} catch (err) {
 		res.status(500).json({ message: err.message });
 	}
@@ -209,13 +259,23 @@ const getAttendanceByClass = async (req, res) => {
 const getAttendanceByStudent = async (req, res) => {
 	try {
 		const { studentId } = req.params;
+		const { schoolYear } = req.query;
+
+		// Determine school year (use provided or auto-calculate)
+		const year = schoolYear || getSchoolYearFromDate();
+
+		// Get the Attendance model for this school year
+		const Attendance = getAttendanceModel(year);
 
 		const attendanceRecords = await Attendance.find({ studentId })
 			.populate('studentId', 'fullName grade gender')
 			.populate('recordedBy', 'fullName email')
 			.sort({ date: -1 });
 
-		res.status(200).json(attendanceRecords);
+		res.status(200).json({
+			schoolYear: year,
+			attendanceRecords,
+		});
 	} catch (err) {
 		res.status(500).json({ message: err.message });
 	}
@@ -227,6 +287,13 @@ const getAttendanceByStudent = async (req, res) => {
 const getAttendanceByDate = async (req, res) => {
 	try {
 		const { date } = req.params;
+		const { schoolYear } = req.query;
+
+		// Determine school year (use provided or auto-calculate)
+		const year = schoolYear || getSchoolYearFromDate(new Date(date));
+
+		// Get the Attendance model for this school year
+		const Attendance = getAttendanceModel(year);
 
 		const attendanceRecords = await Attendance.find({
 			date: new Date(date),
@@ -235,20 +302,27 @@ const getAttendanceByDate = async (req, res) => {
 			.populate('recordedBy', 'fullName email')
 			.sort({ class: 1 });
 
-		res.status(200).json(attendanceRecords);
+		res.status(200).json({
+			schoolYear: year,
+			attendanceRecords,
+		});
 	} catch (err) {
 		res.status(500).json({ message: err.message });
 	}
 };
 
 // @desc    Update attendance record
-// @route   PUT /api/attendance/:id
+// @route   PUT /api/attendance/:schoolYear/:id
 // @access  Protected
 const updateAttendance = async (req, res) => {
 	try {
+		const { schoolYear, id } = req.params;
 		const { status } = req.body;
 
-		const attendance = await Attendance.findById(req.params.id);
+		// Get the Attendance model for this school year
+		const Attendance = getAttendanceModel(schoolYear);
+
+		const attendance = await Attendance.findById(id);
 
 		if (!attendance) {
 			return res.status(404).json({ message: 'Attendance record not found' });
@@ -269,17 +343,22 @@ const updateAttendance = async (req, res) => {
 };
 
 // @desc    Delete attendance record
-// @route   DELETE /api/attendance/:id
+// @route   DELETE /api/attendance/:schoolYear/:id
 // @access  Protected
 const deleteAttendance = async (req, res) => {
 	try {
-		const attendance = await Attendance.findById(req.params.id);
+		const { schoolYear, id } = req.params;
+
+		// Get the Attendance model for this school year
+		const Attendance = getAttendanceModel(schoolYear);
+
+		const attendance = await Attendance.findById(id);
 
 		if (!attendance) {
 			return res.status(404).json({ message: 'Attendance record not found' });
 		}
 
-		await Attendance.findByIdAndDelete(req.params.id);
+		await Attendance.findByIdAndDelete(id);
 
 		res.status(200).json({ message: 'Attendance record deleted successfully' });
 	} catch (err) {
@@ -293,6 +372,13 @@ const deleteAttendance = async (req, res) => {
 const getClassAttendanceStats = async (req, res) => {
 	try {
 		const { className } = req.params;
+		const { schoolYear } = req.query;
+
+		// Determine school year (use provided or auto-calculate)
+		const year = schoolYear || getSchoolYearFromDate();
+
+		// Get the Attendance model for this school year
+		const Attendance = getAttendanceModel(year);
 
 		// Get all attendance records for this class
 		const attendanceRecords = await Attendance.find({ class: className });
@@ -307,6 +393,7 @@ const getClassAttendanceStats = async (req, res) => {
 		const uniqueDates = [...new Set(attendanceRecords.map((r) => r.date.toISOString().split('T')[0]))];
 
 		res.status(200).json({
+			schoolYear: year,
 			class: className,
 			totalRecords,
 			presentCount,

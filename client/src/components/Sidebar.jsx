@@ -1,18 +1,65 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router';
-import { Home, Users, Calendar, Settings, LogOut, Menu, X } from 'lucide-react';
+import { Home, Users, Calendar, Settings, LogOut, Menu, X, Sun, Moon, Monitor, Globe } from 'lucide-react';
 import { useAuth } from '../context/useAuth';
+import axios from 'axios';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
 export default function Sidebar() {
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 	const location = useLocation();
 	const { user, logout } = useAuth();
+	const [preferences, setPreferences] = useState({
+		theme: 'light',
+		language: 'ko',
+	});
+
+	useEffect(() => {
+		const fetchPreferences = async () => {
+			try {
+				const response = await axios.get(`${API_URL}/auth/settings`, {
+					withCredentials: true,
+				});
+				if (response.data.preferences) {
+					setPreferences(response.data.preferences);
+				}
+			} catch (error) {
+				console.error('Failed to fetch preferences:', error);
+			}
+		};
+
+		if (user) {
+			fetchPreferences();
+		}
+	}, [user]);
 
 	const handleLogout = async () => {
 		try {
 			await logout();
 		} catch (error) {
 			console.error('Logout error:', error);
+		}
+	};
+
+	const updatePreference = async (key, value) => {
+		try {
+			const updatedPreferences = { ...preferences, [key]: value };
+			setPreferences(updatedPreferences);
+
+			await axios.put(
+				`${API_URL}/auth/settings`,
+				{
+					preferences: updatedPreferences,
+				},
+				{
+					withCredentials: true,
+				}
+			);
+		} catch (error) {
+			console.error('Failed to update preference:', error);
+			// Revert on error
+			setPreferences(preferences);
 		}
 	};
 
@@ -82,8 +129,8 @@ export default function Sidebar() {
 						</svg>
 					</div>
 					<div>
-						<h1 className="text-lg font-semibold text-gray-900">출석 관리</h1>
-						<p className="text-xs text-gray-500">시스템</p>
+						<h1 className="text-lg font-semibold text-gray-900">런던 성 김대건 성당</h1>
+						<p className="text-xs text-gray-500">주일학교 2025-26</p>
 					</div>
 				</div>
 
@@ -123,6 +170,77 @@ export default function Sidebar() {
 						);
 					})}
 				</nav>
+
+				{/* Preferences */}
+				<div className="px-4 py-3 border-t border-gray-200">
+					<div className="flex items-center justify-between gap-3">
+						{/* Theme Selector */}
+						<div className="flex items-center gap-1.5">
+							<button
+								onClick={() => updatePreference('theme', 'light')}
+								className={`flex items-center justify-center p-1.5 rounded transition-all hover:cursor-pointer ${
+									preferences.theme === 'light'
+										? 'bg-blue-600 text-white'
+										: 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+								}`}
+								title="라이트 모드 (Light Mode)"
+							>
+								<Sun className="w-3.5 h-3.5" />
+							</button>
+							<button
+								onClick={() => updatePreference('theme', 'dark')}
+								className={`flex items-center justify-center p-1.5 rounded transition-all hover:cursor-pointer ${
+									preferences.theme === 'dark'
+										? 'bg-blue-600 text-white'
+										: 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+								}`}
+								title="다크 모드 (Dark Mode)"
+							>
+								<Moon className="w-3.5 h-3.5" />
+							</button>
+							<button
+								onClick={() => updatePreference('theme', 'auto')}
+								className={`flex items-center justify-center p-1.5 rounded transition-all hover:cursor-pointer ${
+									preferences.theme === 'auto'
+										? 'bg-blue-600 text-white'
+										: 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+								}`}
+								title="자동 (시스템 설정에 따름)"
+							>
+								<Monitor className="w-3.5 h-3.5" />
+							</button>
+						</div>
+
+						{/* Divider */}
+						<div className="h-6 w-px bg-gray-300"></div>
+
+						{/* Language Selector */}
+						<div className="flex items-center gap-1.5">
+							<button
+								onClick={() => updatePreference('language', 'ko')}
+								className={`px-2 py-1 rounded text-xs font-medium transition-all hover:cursor-pointer ${
+									preferences.language === 'ko'
+										? 'bg-blue-600 text-white'
+										: 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+								}`}
+								title="한국어 (Korean)"
+							>
+								KO
+							</button>
+							<button
+								onClick={() => updatePreference('language', 'en')}
+								className={`px-2 py-1 rounded text-xs font-medium transition-all hover:cursor-pointer ${
+									preferences.language === 'en'
+										? 'bg-blue-600 text-white'
+										: 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+								}`}
+								title="영어 (English)"
+							>
+								EN
+							</button>
+						</div>
+					</div>
+				</div>
 
 				{/* Logout Button */}
 				<div className="p-4 border-t border-gray-200">

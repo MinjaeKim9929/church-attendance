@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router';
 import axios from 'axios';
 import { ArrowLeft, Calendar, Check, X, Save, Users as UsersIcon } from 'lucide-react';
 import Sidebar from '../../../../components/Sidebar';
+import Toast from '../../../../components/Toast';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
@@ -14,21 +15,26 @@ export default function ClassAttendance() {
 
 	const [students, setStudents] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
-	const [error, setError] = useState('');
 	const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
 	const [attendance, setAttendance] = useState({});
 	const [isSaving, setIsSaving] = useState(false);
-	const [saveSuccess, setSaveSuccess] = useState(false);
+	const [toast, setToast] = useState(null);
 
 	// Fetch students on mount
 	useEffect(() => {
 		fetchStudents();
 	}, [id]);
 
+	// Fetch attendance when date changes
+	useEffect(() => {
+		if (students.length > 0) {
+			fetchAttendanceForDate();
+		}
+	}, [selectedDate, students.length]);
+
 	const fetchStudents = async () => {
 		try {
 			setIsLoading(true);
-			setError('');
 			const response = await axios.get(`${API_URL}/students`, {
 				withCredentials: true,
 			});
@@ -52,24 +58,57 @@ export default function ClassAttendance() {
 
 			setStudents(filteredStudents);
 
-			// Initialize attendance state (default all present)
+			// Initialize attendance state (null = no data saved yet)
 			const initialAttendance = {};
 			filteredStudents.forEach((student) => {
-				initialAttendance[student._id] = true; // true = present, false = absent
+				initialAttendance[student._id] = null; // null = not saved, true = present, false = absent
 			});
 			setAttendance(initialAttendance);
 		} catch (err) {
-			setError(err.response?.data?.message || '학생 목록을 불러오는데 실패했습니다');
+			setToast({
+				message: err.response?.data?.message || '학생 목록을 불러오는데 실패했습니다',
+				type: 'error',
+			});
 		} finally {
 			setIsLoading(false);
 		}
 	};
 
-	const toggleAttendance = (studentId) => {
-		setAttendance({
-			...attendance,
-			[studentId]: !attendance[studentId],
-		});
+	const fetchAttendanceForDate = async () => {
+		try {
+			// Fetch attendance records for the selected date
+			const response = await axios.get(`${API_URL}/attendance/date/${selectedDate}`, {
+				withCredentials: true,
+			});
+
+			// Create a map of existing attendance by studentId
+			const attendanceMap = {};
+			response.data.attendanceRecords.forEach((record) => {
+				attendanceMap[record.studentId._id] = record.status === 'Present';
+			});
+
+			// Update attendance state: use existing records or null if not saved
+			const updatedAttendance = {};
+			students.forEach((student) => {
+				// If attendance exists for this student, use it; otherwise set to null (not saved)
+				updatedAttendance[student._id] = student._id in attendanceMap
+					? attendanceMap[student._id]
+					: null;
+			});
+
+			setAttendance(updatedAttendance);
+		} catch (err) {
+			// If no records found, set all to null (not saved)
+			if (err.response?.status === 404 || err.response?.status === 500) {
+				const defaultAttendance = {};
+				students.forEach((student) => {
+					defaultAttendance[student._id] = null; // null = not saved yet
+				});
+				setAttendance(defaultAttendance);
+			} else {
+				console.error('Error fetching attendance:', err);
+			}
+		}
 	};
 
 	const toggleAll = (isPresent) => {
@@ -82,36 +121,56 @@ export default function ClassAttendance() {
 
 	const handleSave = async () => {
 		setIsSaving(true);
-		setSaveSuccess(false);
 		try {
-			// Prepare attendance data
-			const attendanceData = {
-				date: selectedDate,
-				classId: id,
-				className: classInfo?.name || '전체 학생',
-				records: Object.entries(attendance).map(([studentId, isPresent]) => ({
+			// Prepare attendance records in backend format (filter out null values - students not marked)
+			const attendanceRecords = Object.entries(attendance)
+				.filter(([, isPresent]) => isPresent !== null) // Only include students with attendance marked
+				.map(([studentId, isPresent]) => ({
 					studentId,
-					isPresent,
-				})),
-			};
+					status: isPresent ? 'Present' : 'Absent',
+				}));
 
-			// TODO: Send to backend API
-			console.log('Saving attendance:', attendanceData);
+			// Check if there are any records to save
+			if (attendanceRecords.length === 0) {
+				setToast({
+					message: '출석을 체크한 학생이 없습니다',
+					type: 'error',
+				});
+				setIsSaving(false);
+				return;
+			}
 
-			// Simulate API call
-			await new Promise((resolve) => setTimeout(resolve, 1000));
+			// Send to backend API
+			const response = await axios.post(
+				`${API_URL}/attendance/bulk`,
+				{
+					date: selectedDate,
+					attendanceRecords,
+				},
+				{
+					withCredentials: true,
+				}
+			);
 
-			setSaveSuccess(true);
-			setTimeout(() => setSaveSuccess(false), 3000);
+			setToast({
+				message: '출석이 성공적으로 저장되었습니다!',
+				type: 'success',
+			});
+
+			console.log('Attendance saved:', response.data);
 		} catch (err) {
-			setError(err.response?.data?.message || '출석 저장에 실패했습니다');
+			setToast({
+				message: err.response?.data?.message || '출석 저장에 실패했습니다',
+				type: 'error',
+			});
+			console.error('Error saving attendance:', err);
 		} finally {
 			setIsSaving(false);
 		}
 	};
 
-	const presentCount = Object.values(attendance).filter((isPresent) => isPresent).length;
-	const absentCount = students.length - presentCount;
+	const presentCount = Object.values(attendance).filter((status) => status === true).length;
+	const absentCount = Object.values(attendance).filter((status) => status === false).length;
 
 	return (
 		<div className="flex h-screen bg-gray-50">
@@ -136,7 +195,7 @@ export default function ClassAttendance() {
 									{classInfo?.description && `${classInfo.description} • `}총 {students.length}명
 								</p>
 							</div>
-							<div className="flex items-center gap-2">
+							<div className="flex items-center justify-center sm:justify-end gap-2">
 								<button
 									onClick={() => {
 										const yesterday = new Date(selectedDate);
@@ -184,37 +243,37 @@ export default function ClassAttendance() {
 					</div>
 
 					{/* Statistics Cards */}
-					<div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
-						<div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5 shadow-sm">
-							<div className="flex items-center gap-3">
-								<div className="p-2.5 bg-blue-50 rounded-lg">
-									<UsersIcon className="w-5 h-5 text-blue-600" />
+					<div className="grid grid-cols-3 gap-3 sm:gap-4 mb-6">
+						<div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5 shadow-sm">
+							<div className="flex flex-col items-center text-center sm:flex-row sm:text-left sm:gap-3">
+								<div className="p-2 sm:p-2.5 bg-blue-50 rounded-lg mb-2 sm:mb-0">
+									<UsersIcon className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
 								</div>
 								<div>
 									<p className="text-xs sm:text-sm text-gray-600 font-medium">총 인원</p>
-									<p className="text-xl sm:text-2xl font-bold text-gray-900">{students.length}</p>
+									<p className="text-lg sm:text-2xl font-bold text-gray-900">{students.length}</p>
 								</div>
 							</div>
 						</div>
-						<div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5 shadow-sm">
-							<div className="flex items-center gap-3">
-								<div className="p-2.5 bg-emerald-50 rounded-lg">
-									<Check className="w-5 h-5 text-emerald-600" />
+						<div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5 shadow-sm">
+							<div className="flex flex-col items-center text-center sm:flex-row sm:text-left sm:gap-3">
+								<div className="p-2 sm:p-2.5 bg-emerald-50 rounded-lg mb-2 sm:mb-0">
+									<Check className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600" />
 								</div>
 								<div>
 									<p className="text-xs sm:text-sm text-gray-600 font-medium">출석</p>
-									<p className="text-xl sm:text-2xl font-bold text-emerald-600">{presentCount}</p>
+									<p className="text-lg sm:text-2xl font-bold text-emerald-600">{presentCount}</p>
 								</div>
 							</div>
 						</div>
-						<div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5 shadow-sm">
-							<div className="flex items-center gap-3">
-								<div className="p-2.5 bg-rose-50 rounded-lg">
-									<X className="w-5 h-5 text-rose-600" />
+						<div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5 shadow-sm">
+							<div className="flex flex-col items-center text-center sm:flex-row sm:text-left sm:gap-3">
+								<div className="p-2 sm:p-2.5 bg-rose-50 rounded-lg mb-2 sm:mb-0">
+									<X className="w-4 h-4 sm:w-5 sm:h-5 text-rose-600" />
 								</div>
 								<div>
 									<p className="text-xs sm:text-sm text-gray-600 font-medium">결석</p>
-									<p className="text-xl sm:text-2xl font-bold text-rose-600">{absentCount}</p>
+									<p className="text-lg sm:text-2xl font-bold text-rose-600">{absentCount}</p>
 								</div>
 							</div>
 						</div>
@@ -235,6 +294,16 @@ export default function ClassAttendance() {
 							전체 결석
 						</button>
 					</div>
+
+					{/* Toast Notification */}
+					{toast && (
+						<Toast
+							message={toast.message}
+							type={toast.type}
+							onClose={() => setToast(null)}
+							duration={3000}
+						/>
+					)}
 
 					{/* Loading State */}
 					{isLoading ? (
@@ -290,7 +359,7 @@ export default function ClassAttendance() {
 																<button
 																	onClick={() => setAttendance({ ...attendance, [student._id]: true })}
 																	className={`inline-flex items-center justify-center px-3 py-2 rounded-lg font-semibold text-xs transition-all hover:cursor-pointer ${
-																		attendance[student._id]
+																		attendance[student._id] === true
 																			? 'bg-emerald-500 text-white shadow-md hover:bg-emerald-600'
 																			: 'bg-white text-gray-500 border border-gray-300 hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-300'
 																	}`}
@@ -301,7 +370,7 @@ export default function ClassAttendance() {
 																<button
 																	onClick={() => setAttendance({ ...attendance, [student._id]: false })}
 																	className={`inline-flex items-center justify-center px-3 py-2 rounded-lg font-semibold text-xs transition-all hover:cursor-pointer ${
-																		!attendance[student._id]
+																		attendance[student._id] === false
 																			? 'bg-rose-500 text-white shadow-md hover:bg-rose-600'
 																			: 'bg-white text-gray-500 border border-gray-300 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-300'
 																	}`}

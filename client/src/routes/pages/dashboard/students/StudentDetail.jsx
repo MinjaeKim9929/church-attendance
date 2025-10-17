@@ -5,6 +5,7 @@ import { ArrowLeft, Edit2, Trash2 } from 'lucide-react';
 import Sidebar from '../../../../components/Sidebar';
 import DeleteConfirmModal from '../../../../components/DeleteConfirmModal';
 import AddStudentModal from '../../../../components/AddStudentModal';
+import Toast from '../../../../components/Toast';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
@@ -18,6 +19,7 @@ export default function StudentDetail() {
 	const [deleteModal, setDeleteModal] = useState(false);
 	const [isDeleting, setIsDeleting] = useState(false);
 	const [editModal, setEditModal] = useState(false);
+	const [toast, setToast] = useState(null);
 
 	useEffect(() => {
 		fetchStudent();
@@ -49,6 +51,10 @@ export default function StudentDetail() {
 			});
 			setStudent(response.data);
 			setEditModal(false);
+			setToast({
+				message: '학생 정보가 성공적으로 수정되었습니다!',
+				type: 'success',
+			});
 		} catch (err) {
 			throw new Error(err.response?.data?.message || '학생 정보 수정에 실패했습니다');
 		}
@@ -134,11 +140,9 @@ export default function StudentDetail() {
 						</button>
 					</div>
 
-					{/* Error Message */}
-					{error && (
-						<div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-							<p className="text-sm text-red-600">{error}</p>
-						</div>
+					{/* Toast Notification */}
+					{toast && (
+						<Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} duration={3000} />
 					)}
 
 					{/* Student Info Card */}

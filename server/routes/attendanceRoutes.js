@@ -31,7 +31,7 @@ router.get('/date/:date', protect, getAttendanceByDate);
 
 // Single record CRUD
 router.post('/', protect, createAttendance);
-router.put('/:id', protect, updateAttendance);
-router.delete('/:id', protect, deleteAttendance);
+router.put('/:schoolYear/:id', protect, updateAttendance);
+router.delete('/:schoolYear/:id', protect, deleteAttendance);
 
 module.exports = router;
