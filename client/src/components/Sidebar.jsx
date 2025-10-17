@@ -10,10 +10,7 @@ export default function Sidebar() {
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 	const location = useLocation();
 	const { user, logout } = useAuth();
-	const [preferences, setPreferences] = useState({
-		theme: 'light',
-		language: 'ko',
-	});
+	const [preferences, setPreferences] = useState(null);
 
 	useEffect(() => {
 		const fetchPreferences = async () => {
@@ -26,6 +23,11 @@ export default function Sidebar() {
 				}
 			} catch (error) {
 				console.error('Failed to fetch preferences:', error);
+				// Set default values on error
+				setPreferences({
+					theme: 'light',
+					language: 'ko',
+				});
 			}
 		};
 
@@ -43,6 +45,8 @@ export default function Sidebar() {
 	};
 
 	const updatePreference = async (key, value) => {
+		if (!preferences) return;
+
 		try {
 			const updatedPreferences = { ...preferences, [key]: value };
 			setPreferences(updatedPreferences);
@@ -172,75 +176,77 @@ export default function Sidebar() {
 				</nav>
 
 				{/* Preferences */}
-				<div className="px-4 py-3 border-t border-gray-200">
-					<div className="flex items-center justify-between gap-3">
-						{/* Theme Selector */}
-						<div className="flex items-center gap-1.5">
-							<button
-								onClick={() => updatePreference('theme', 'light')}
-								className={`flex items-center justify-center p-1.5 rounded transition-all hover:cursor-pointer ${
-									preferences.theme === 'light'
-										? 'bg-blue-600 text-white'
-										: 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-								}`}
-								title="라이트 모드 (Light Mode)"
-							>
-								<Sun className="w-3.5 h-3.5" />
-							</button>
-							<button
-								onClick={() => updatePreference('theme', 'dark')}
-								className={`flex items-center justify-center p-1.5 rounded transition-all hover:cursor-pointer ${
-									preferences.theme === 'dark'
-										? 'bg-blue-600 text-white'
-										: 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-								}`}
-								title="다크 모드 (Dark Mode)"
-							>
-								<Moon className="w-3.5 h-3.5" />
-							</button>
-							<button
-								onClick={() => updatePreference('theme', 'auto')}
-								className={`flex items-center justify-center p-1.5 rounded transition-all hover:cursor-pointer ${
-									preferences.theme === 'auto'
-										? 'bg-blue-600 text-white'
-										: 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-								}`}
-								title="자동 (시스템 설정에 따름)"
-							>
-								<Monitor className="w-3.5 h-3.5" />
-							</button>
-						</div>
+				{preferences && (
+					<div className="px-4 py-3 border-t border-gray-200">
+						<div className="flex items-center justify-between gap-3">
+							{/* Theme Selector */}
+							<div className="flex items-center gap-1.5">
+								<button
+									onClick={() => updatePreference('theme', 'light')}
+									className={`flex items-center justify-center p-1.5 rounded transition-all hover:cursor-pointer ${
+										preferences.theme === 'light'
+											? 'bg-blue-600 text-white'
+											: 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+									}`}
+									title="라이트 모드 (Light Mode)"
+								>
+									<Sun className="w-3.5 h-3.5" />
+								</button>
+								<button
+									onClick={() => updatePreference('theme', 'dark')}
+									className={`flex items-center justify-center p-1.5 rounded transition-all hover:cursor-pointer ${
+										preferences.theme === 'dark'
+											? 'bg-blue-600 text-white'
+											: 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+									}`}
+									title="다크 모드 (Dark Mode)"
+								>
+									<Moon className="w-3.5 h-3.5" />
+								</button>
+								<button
+									onClick={() => updatePreference('theme', 'auto')}
+									className={`flex items-center justify-center p-1.5 rounded transition-all hover:cursor-pointer ${
+										preferences.theme === 'auto'
+											? 'bg-blue-600 text-white'
+											: 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+									}`}
+									title="자동 (시스템 설정에 따름)"
+								>
+									<Monitor className="w-3.5 h-3.5" />
+								</button>
+							</div>
 
-						{/* Divider */}
-						<div className="h-6 w-px bg-gray-300"></div>
+							{/* Divider */}
+							<div className="h-6 w-px bg-gray-300"></div>
 
-						{/* Language Selector */}
-						<div className="flex items-center gap-1.5">
-							<button
-								onClick={() => updatePreference('language', 'ko')}
-								className={`px-2 py-1 rounded text-xs font-medium transition-all hover:cursor-pointer ${
-									preferences.language === 'ko'
-										? 'bg-blue-600 text-white'
-										: 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-								}`}
-								title="한국어 (Korean)"
-							>
-								KO
-							</button>
-							<button
-								onClick={() => updatePreference('language', 'en')}
-								className={`px-2 py-1 rounded text-xs font-medium transition-all hover:cursor-pointer ${
-									preferences.language === 'en'
-										? 'bg-blue-600 text-white'
-										: 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-								}`}
-								title="영어 (English)"
-							>
-								EN
-							</button>
+							{/* Language Selector */}
+							<div className="flex items-center gap-1.5">
+								<button
+									onClick={() => updatePreference('language', 'ko')}
+									className={`px-2 py-1 rounded text-xs font-medium transition-all hover:cursor-pointer ${
+										preferences.language === 'ko'
+											? 'bg-blue-600 text-white'
+											: 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+									}`}
+									title="한국어 (Korean)"
+								>
+									KO
+								</button>
+								<button
+									onClick={() => updatePreference('language', 'en')}
+									className={`px-2 py-1 rounded text-xs font-medium transition-all hover:cursor-pointer ${
+										preferences.language === 'en'
+											? 'bg-blue-600 text-white'
+											: 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+									}`}
+									title="영어 (English)"
+								>
+									EN
+								</button>
+							</div>
 						</div>
 					</div>
-				</div>
+				)}
 
 				{/* Logout Button */}
 				<div className="p-4 border-t border-gray-200">
