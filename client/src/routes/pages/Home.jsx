@@ -9,7 +9,7 @@ export default function Home() {
 		return (
 			<div className="min-h-screen bg-gradient-to-br from-blue-100 via-white to-indigo-100 flex items-center justify-center">
 				<div className="text-center">
-					<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+					<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
 					<p className="mt-4 text-gray-600">Loading...</p>
 				</div>
 			</div>
@@ -22,7 +22,7 @@ export default function Home() {
 				<div className="bg-white rounded-lg shadow-lg p-6 sm:p-8 border border-gray-100">
 					{/* Header */}
 					<div className="text-center mb-6 sm:mb-8">
-						<div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-blue-600 rounded-full mb-3 sm:mb-4">
+						<div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-primary-600 rounded-full mb-3 sm:mb-4">
 							<svg className="w-7 h-7 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path
 									strokeLinecap="round"
@@ -45,7 +45,7 @@ export default function Home() {
 						<div className="space-y-4">
 							<Link
 								to="/dashboard"
-								className="block w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 sm:py-2.5 text-sm sm:text-base rounded-lg transition-colors shadow-sm hover:shadow-md text-center"
+								className="block w-full bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 sm:py-2.5 text-sm sm:text-base rounded-lg transition-colors shadow-sm hover:shadow-md text-center"
 							>
 								Go to Dashboard
 							</Link>
@@ -54,13 +54,13 @@ export default function Home() {
 						<div className="space-y-4">
 							<Link
 								to="/signup"
-								className="block w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 sm:py-2.5 text-sm sm:text-base rounded-lg transition-colors shadow-sm hover:shadow-md text-center"
+								className="block w-full bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 sm:py-2.5 text-sm sm:text-base rounded-lg transition-colors shadow-sm hover:shadow-md text-center"
 							>
 								Sign Up
 							</Link>
 							<Link
 								to="/login"
-								className="block w-full bg-white text-blue-600 font-medium py-2 sm:py-2.5 text-sm sm:text-base rounded-lg border-2 border-blue-600 hover:bg-blue-50 transition-colors shadow-sm hover:shadow-md text-center"
+								className="block w-full bg-white text-primary-600 font-medium py-2 sm:py-2.5 text-sm sm:text-base rounded-lg border-2 border-primary-600 hover:bg-primary-50 transition-colors shadow-sm hover:shadow-md text-center"
 							>
 								Log In
 							</Link>

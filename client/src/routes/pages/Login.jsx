@@ -102,12 +102,12 @@ export default function Login() {
 	};
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-blue-100 via-white to-indigo-100 flex items-center justify-center p-4 sm:p-6 lg:p-8">
+		<div className="min-h-screen bg-gradient-to-br from-primary-100 via-white to-primary-200 flex items-center justify-center p-4 sm:p-6 lg:p-8">
 			<div className="w-full max-w-md">
 				<div className="bg-white rounded-lg shadow-lg p-6 sm:p-8 border border-gray-100">
 					{/* Header */}
 					<div className="text-center mb-6 sm:mb-8">
-						<div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-blue-600 rounded-full mb-3 sm:mb-4">
+						<div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-primary-500 rounded-full mb-3 sm:mb-4">
 							<svg className="w-7 h-7 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path
 									strokeLinecap="round"
@@ -137,11 +137,11 @@ export default function Login() {
 								id="email"
 								value={email}
 								onChange={handleEmailChange}
-								disable={authLoading}
+								disabled={authLoading}
 								className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base border rounded-lg transition-all outline-none disabled:bg-gray-50 disabled:cursor-not-allowed ${
 									errors.email
 										? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-transparent'
-										: 'border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+										: 'border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent'
 								}`}
 								placeholder="your.email@example.com"
 							/>
@@ -162,7 +162,7 @@ export default function Login() {
 									className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 pr-10 sm:pr-12 text-sm sm:text-base border rounded-lg transition-all outline-none disabled:bg-gray-50 disabled:cursor-not-allowed ${
 										errors.password
 											? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-transparent'
-											: 'border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+											: 'border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent'
 									}`}
 									placeholder="비밀번호를 입력하세요"
 								/>
@@ -189,7 +189,7 @@ export default function Login() {
 									type="checkbox"
 									checked={rememberMe}
 									onChange={(e) => setRememberMe(e.target.checked)}
-									className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+									className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
 									disabled={authLoading}
 								/>
 								<span className="ml-1.5 sm:ml-2 text-gray-600">로그인 상태 유지</span>
@@ -199,7 +199,7 @@ export default function Login() {
 						<button
 							type="submit"
 							disabled={authLoading}
-							className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 sm:py-2.5 text-sm sm:text-base rounded-lg transition-colors shadow-sm hover:shadow-md hover:cursor-pointer disabled:bg-blue-400 disabled:cursor-not-allowed"
+							className="w-full bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 sm:py-2.5 text-sm sm:text-base rounded-lg transition-colors shadow-sm hover:shadow-md hover:cursor-pointer disabled:bg-primary-400 disabled:cursor-not-allowed"
 						>
 							로그인
 						</button>
@@ -211,7 +211,7 @@ export default function Login() {
 							계정이 없으신가요?{' '}
 							<a
 								href="/signup"
-								className="text-blue-600 hover:text-blue-700 hover:underline font-medium transition-colors"
+								className="text-primary-600 hover:text-primary-700 hover:underline font-medium transition-colors"
 							>
 								회원가입
 							</a>

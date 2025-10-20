@@ -1,5 +1,102 @@
 @import 'tailwindcss';
 
+@theme {
+	/* Primary Colors - Lavender Purple */
+	--color-primary-50: #f5f1fe;
+	--color-primary-100: #ebe3fd;
+	--color-primary-200: #d1bbfa;
+	--color-primary-300: #b89bf7;
+	--color-primary-400: #9f7af4;
+	--color-primary-500: #8659f1;
+	--color-primary-600: #7444d8;
+	--color-primary-700: #5f35b8;
+	--color-primary-800: #4a2891;
+	--color-primary-900: #3d2176;
+	--color-primary-950: #2a1540;
+
+	/* Accent Colors - Mint Green */
+	--color-accent-50: #f0fdf4;
+	--color-accent-100: #dcfce7;
+	--color-accent-200: #bbf7d0;
+	--color-accent-300: #86efac;
+	--color-accent-400: #4ade80;
+	--color-accent-500: #22c55e;
+	--color-accent-600: #16a34a;
+	--color-accent-700: #15803d;
+	--color-accent-800: #166534;
+	--color-accent-900: #14532d;
+
+	/* Surface Colors */
+	--color-surface-light: #ffffff;
+	--color-surface-light-hover: #f9fafb;
+	--color-surface-light-active: #f3f4f6;
+	--color-surface-dark: #1e293b;
+	--color-surface-dark-hover: #334155;
+	--color-surface-dark-active: #475569;
+
+	/* Border Colors */
+	--color-border-light: #e5e7eb;
+	--color-border-light-strong: #d1d5db;
+	--color-border-light-focus: #d1bbfa;
+	--color-border-dark: #334155;
+	--color-border-dark-strong: #475569;
+	--color-border-dark-focus: #b89bf7;
+
+	/* Text Colors */
+	--color-text-light-primary: #111827;
+	--color-text-light-secondary: #6b7280;
+	--color-text-light-muted: #9ca3af;
+	--color-text-light-disabled: #d1d5db;
+	--color-text-dark-primary: #f1f5f9;
+	--color-text-dark-secondary: #cbd5e1;
+	--color-text-dark-muted: #94a3b8;
+	--color-text-dark-disabled: #475569;
+
+	/* Success Colors */
+	--color-success-light: #10b981;
+	--color-success-light-bg: #d1fae5;
+	--color-success-light-text: #065f46;
+	--color-success-dark: #34d399;
+	--color-success-dark-bg: #064e3b;
+	--color-success-dark-text: #d1fae5;
+
+	/* Warning Colors */
+	--color-warning-light: #f59e0b;
+	--color-warning-light-bg: #fef3c7;
+	--color-warning-light-text: #78350f;
+	--color-warning-dark: #fbbf24;
+	--color-warning-dark-bg: #78350f;
+	--color-warning-dark-text: #fef3c7;
+
+	/* Error Colors */
+	--color-error-light: #ef4444;
+	--color-error-light-bg: #fee2e2;
+	--color-error-light-text: #7f1d1d;
+	--color-error-dark: #f87171;
+	--color-error-dark-bg: #7f1d1d;
+	--color-error-dark-text: #fee2e2;
+
+	/* Info Colors */
+	--color-info-light: #3b82f6;
+	--color-info-light-bg: #dbeafe;
+	--color-info-light-text: #1e3a8a;
+	--color-info-dark: #60a5fa;
+	--color-info-dark-bg: #1e3a8a;
+	--color-info-dark-text: #dbeafe;
+
+	/* Background Colors */
+	--color-background-light: #ffffff;
+	--color-background-light-alt: #f9fafb;
+	--color-background-dark: #0f172a;
+	--color-background-dark-alt: #1e293b;
+
+	/* Highlight Colors */
+	--color-highlight-light-primary: #faf5ff;
+	--color-highlight-light-accent: #f0fdf4;
+	--color-highlight-dark-primary: #3d2176;
+	--color-highlight-dark-accent: #14532d;
+}
+
 @keyframes slide-in-right {
 	from {
 		transform: translateX(100%);

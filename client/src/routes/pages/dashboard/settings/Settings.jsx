@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useBlocker } from 'react-router';
+import { useBlocker } from 'react-router';
 import axios from 'axios';
 import { Save, Plus, Trash2, AlertTriangle } from 'lucide-react';
 import Sidebar from '../../../../components/Sidebar';
@@ -10,7 +10,6 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 const AVAILABLE_GRADES = ['JK', 'SK', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
 
 export default function Settings() {
-	const navigate = useNavigate();
 	const [schoolYear, setSchoolYear] = useState('');
 	const [classes, setClasses] = useState([]);
 	const [originalClasses, setOriginalClasses] = useState([]);
@@ -46,6 +45,21 @@ export default function Settings() {
 
 	useEffect(() => {
 		fetchSettings();
+
+		// Listen for preference updates from Sidebar
+		const handlePreferencesUpdate = (event) => {
+			if (event.detail) {
+				setUserSettings((prev) => ({
+					...prev,
+					preferences: event.detail,
+				}));
+			}
+		};
+
+		window.addEventListener('preferencesUpdated', handlePreferencesUpdate);
+		return () => {
+			window.removeEventListener('preferencesUpdated', handlePreferencesUpdate);
+		};
 	}, []);
 
 	useEffect(() => {
@@ -181,6 +195,13 @@ export default function Settings() {
 				}
 			);
 
+			// Dispatch event to notify Sidebar of saved preferences
+			window.dispatchEvent(
+				new CustomEvent('preferencesUpdated', {
+					detail: userSettings.preferences,
+				})
+			);
+
 			// Save class configuration
 			if (classes.length > 0) {
 				await axios.post(
@@ -229,12 +250,12 @@ export default function Settings() {
 
 	if (isLoading) {
 		return (
-			<div className="flex h-screen bg-gray-50">
+			<div className="flex h-screen bg-gray-50 dark:bg-page-dark">
 				<Sidebar />
 				<main className="flex-1 overflow-y-auto">
 					<div className="p-6 sm:p-8 lg:pl-8 pt-20 lg:pt-7">
 						<div className="flex items-center justify-center py-12">
-							<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+							<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
 						</div>
 					</div>
 				</main>
@@ -243,14 +264,14 @@ export default function Settings() {
 	}
 
 	return (
-		<div className="flex h-screen bg-gray-50">
+		<div className="flex h-screen bg-gray-50 dark:bg-page-dark">
 			<Sidebar />
 			<main className="flex-1 overflow-y-auto">
 				<div className="p-6 sm:p-8 lg:pl-8 pt-20 lg:pt-7 max-w-5xl mx-auto">
 					{/* Header */}
 					<div className="mb-6">
-						<h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">설정</h1>
-						<p className="text-sm text-gray-600">
+						<h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-text-dark-primary mb-2">설정</h1>
+						<p className="text-sm text-gray-600 dark:text-text-dark-secondary">
 							학년도: <span className="font-semibold">{schoolYear}</span>
 						</p>
 					</div>
@@ -261,79 +282,112 @@ export default function Settings() {
 					)}
 
 					{/* User Settings */}
-					<div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-6">
-						<h2 className="text-xl font-semibold text-gray-900 mb-6">사용자 설정</h2>
+					<div className="bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-border-dark shadow-sm p-6 mb-6">
+						<h2 className="text-xl font-semibold text-gray-900 dark:text-text-dark-primary mb-6">사용자 설정</h2>
 
 						<div className="space-y-6">
 							{/* Full Name */}
 							<div>
-								<label className="block text-sm font-medium text-gray-700 mb-2">이름</label>
+								<label className="block text-sm font-medium text-gray-700 dark:text-text-dark-secondary mb-2">
+									이름
+								</label>
 								<input
 									type="text"
 									value={userSettings.fullName}
 									onChange={(e) => setUserSettings({ ...userSettings, fullName: e.target.value })}
 									placeholder="이름을 입력하세요"
-									className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+									className="w-full px-4 py-2 border border-gray-300 dark:border-border-dark rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none bg-white dark:bg-surface-dark dark:text-text-dark-primary"
 								/>
 							</div>
 
 							{/* Email (Read-only) */}
 							<div>
-								<label className="block text-sm font-medium text-gray-700 mb-2">이메일</label>
+								<label className="block text-sm font-medium text-gray-700 dark:text-text-dark-secondary mb-2">
+									이메일
+								</label>
 								<input
 									type="email"
 									value={userSettings.email}
 									disabled
-									className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
+									className="w-full px-4 py-2 border border-gray-300 dark:border-border-dark rounded-lg bg-gray-50 dark:bg-surface-dark-hover text-gray-500 dark:text-text-dark-muted cursor-not-allowed"
 								/>
-								<p className="text-xs text-gray-500 mt-1">이메일은 변경할 수 없습니다</p>
+								<p className="text-xs text-gray-500 dark:text-text-dark-muted mt-1">이메일은 변경할 수 없습니다</p>
 							</div>
 
 							{/* Phone */}
 							<div>
-								<label className="block text-sm font-medium text-gray-700 mb-2">전화번호</label>
+								<label className="block text-sm font-medium text-gray-700 dark:text-text-dark-secondary mb-2">
+									전화번호
+								</label>
 								<input
 									type="tel"
 									value={userSettings.phone}
 									onChange={(e) => setUserSettings({ ...userSettings, phone: e.target.value })}
 									placeholder="전화번호를 입력하세요"
-									className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+									className="w-full px-4 py-2 border border-gray-300 dark:border-border-dark rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none bg-white dark:bg-surface-dark dark:text-text-dark-primary"
 								/>
 							</div>
 
 							{/* Theme */}
 							<div>
-								<label className="block text-sm font-medium text-gray-700 mb-2">테마</label>
+								<label className="block text-sm font-medium text-gray-700 dark:text-text-dark-secondary mb-2">테마</label>
 								<div className="grid grid-cols-3 gap-3">
 									<button
 										type="button"
-										onClick={() => setUserSettings({ ...userSettings, preferences: { ...userSettings.preferences, theme: 'light' } })}
+										onClick={() => {
+											const updatedSettings = { ...userSettings, preferences: { ...userSettings.preferences, theme: 'light' } };
+											setUserSettings(updatedSettings);
+											// Dispatch event to notify Sidebar
+											window.dispatchEvent(
+												new CustomEvent('preferencesUpdated', {
+													detail: updatedSettings.preferences,
+												})
+											);
+										}}
 										className={`px-4 py-3 rounded-lg font-medium text-sm transition-all border-2 hover:cursor-pointer ${
 											userSettings.preferences.theme === 'light'
-												? 'bg-blue-600 text-white border-blue-600 shadow-md'
-												: 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+												? 'bg-primary-500 text-white border-primary-500 shadow-md'
+												: 'bg-white dark:bg-surface-dark text-gray-700 dark:text-text-dark-primary border-gray-300 dark:border-border-dark hover:bg-gray-50 dark:hover:bg-surface-dark-hover'
 										}`}
 									>
 										라이트
 									</button>
 									<button
 										type="button"
-										onClick={() => setUserSettings({ ...userSettings, preferences: { ...userSettings.preferences, theme: 'dark' } })}
+										onClick={() => {
+											const updatedSettings = { ...userSettings, preferences: { ...userSettings.preferences, theme: 'dark' } };
+											setUserSettings(updatedSettings);
+											// Dispatch event to notify Sidebar
+											window.dispatchEvent(
+												new CustomEvent('preferencesUpdated', {
+													detail: updatedSettings.preferences,
+												})
+											);
+										}}
 										className={`px-4 py-3 rounded-lg font-medium text-sm transition-all border-2 hover:cursor-pointer ${
 											userSettings.preferences.theme === 'dark'
-												? 'bg-blue-600 text-white border-blue-600 shadow-md'
-												: 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+												? 'bg-primary-500 text-white border-primary-500 shadow-md'
+												: 'bg-white dark:bg-surface-dark text-gray-700 dark:text-text-dark-primary border-gray-300 dark:border-border-dark hover:bg-gray-50 dark:hover:bg-surface-dark-hover'
 										}`}
 									>
 										다크
 									</button>
 									<button
 										type="button"
-										onClick={() => setUserSettings({ ...userSettings, preferences: { ...userSettings.preferences, theme: 'auto' } })}
+										onClick={() => {
+											const updatedSettings = { ...userSettings, preferences: { ...userSettings.preferences, theme: 'auto' } };
+											setUserSettings(updatedSettings);
+											// Dispatch event to notify Sidebar
+											window.dispatchEvent(
+												new CustomEvent('preferencesUpdated', {
+													detail: updatedSettings.preferences,
+												})
+											);
+										}}
 										className={`px-4 py-3 rounded-lg font-medium text-sm transition-all border-2 hover:cursor-pointer ${
 											userSettings.preferences.theme === 'auto'
-												? 'bg-blue-600 text-white border-blue-600 shadow-md'
-												: 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+												? 'bg-primary-500 text-white border-primary-500 shadow-md'
+												: 'bg-white dark:bg-surface-dark text-gray-700 dark:text-text-dark-primary border-gray-300 dark:border-border-dark hover:bg-gray-50 dark:hover:bg-surface-dark-hover'
 										}`}
 									>
 										자동
@@ -343,26 +397,44 @@ export default function Settings() {
 
 							{/* Language */}
 							<div>
-								<label className="block text-sm font-medium text-gray-700 mb-2">언어</label>
+								<label className="block text-sm font-medium text-gray-700 dark:text-text-dark-secondary mb-2">언어</label>
 								<div className="grid grid-cols-2 gap-3">
 									<button
 										type="button"
-										onClick={() => setUserSettings({ ...userSettings, preferences: { ...userSettings.preferences, language: 'ko' } })}
+										onClick={() => {
+											const updatedSettings = { ...userSettings, preferences: { ...userSettings.preferences, language: 'ko' } };
+											setUserSettings(updatedSettings);
+											// Dispatch event to notify Sidebar
+											window.dispatchEvent(
+												new CustomEvent('preferencesUpdated', {
+													detail: updatedSettings.preferences,
+												})
+											);
+										}}
 										className={`px-4 py-3 rounded-lg font-medium text-sm transition-all border-2 hover:cursor-pointer ${
 											userSettings.preferences.language === 'ko'
-												? 'bg-blue-600 text-white border-blue-600 shadow-md'
-												: 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+												? 'bg-primary-500 text-white border-primary-500 shadow-md'
+												: 'bg-white dark:bg-surface-dark text-gray-700 dark:text-text-dark-primary border-gray-300 dark:border-border-dark hover:bg-gray-50 dark:hover:bg-surface-dark-hover'
 										}`}
 									>
 										한국어
 									</button>
 									<button
 										type="button"
-										onClick={() => setUserSettings({ ...userSettings, preferences: { ...userSettings.preferences, language: 'en' } })}
+										onClick={() => {
+											const updatedSettings = { ...userSettings, preferences: { ...userSettings.preferences, language: 'en' } };
+											setUserSettings(updatedSettings);
+											// Dispatch event to notify Sidebar
+											window.dispatchEvent(
+												new CustomEvent('preferencesUpdated', {
+													detail: updatedSettings.preferences,
+												})
+											);
+										}}
 										className={`px-4 py-3 rounded-lg font-medium text-sm transition-all border-2 hover:cursor-pointer ${
 											userSettings.preferences.language === 'en'
-												? 'bg-blue-600 text-white border-blue-600 shadow-md'
-												: 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+												? 'bg-primary-500 text-white border-primary-500 shadow-md'
+												: 'bg-white dark:bg-surface-dark text-gray-700 dark:text-text-dark-primary border-gray-300 dark:border-border-dark hover:bg-gray-50 dark:hover:bg-surface-dark-hover'
 										}`}
 									>
 										English
@@ -373,12 +445,12 @@ export default function Settings() {
 					</div>
 
 					{/* Class Configuration */}
-					<div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-6">
+					<div className="bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-border-dark shadow-sm p-6 mb-6">
 						<div className="flex items-center justify-between mb-6">
-							<h2 className="text-xl font-semibold text-gray-900">반 설정</h2>
+							<h2 className="text-xl font-semibold text-gray-900 dark:text-text-dark-primary">반 설정</h2>
 							<button
 								onClick={handleAddClass}
-								className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors hover:cursor-pointer"
+								className="inline-flex items-center gap-2 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors hover:cursor-pointer"
 							>
 								<Plus className="w-4 h-4" />
 								<span>반 추가</span>
@@ -386,11 +458,11 @@ export default function Settings() {
 						</div>
 
 						{classes.length === 0 ? (
-							<div className="text-center py-12 bg-gray-50 rounded-lg">
-								<p className="text-gray-500 mb-4">설정된 반이 없습니다</p>
+							<div className="text-center py-12 bg-gray-50 dark:bg-surface-dark-hover rounded-lg">
+								<p className="text-gray-500 dark:text-text-dark-secondary mb-4">설정된 반이 없습니다</p>
 								<button
 									onClick={handleAddClass}
-									className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors hover:cursor-pointer"
+									className="inline-flex items-center gap-2 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors hover:cursor-pointer"
 								>
 									<Plus className="w-4 h-4" />
 									<span>첫 번째 반 추가하기</span>
@@ -399,21 +471,23 @@ export default function Settings() {
 						) : (
 							<div className="space-y-6">
 								{classes.map((classInfo, index) => (
-									<div key={index} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+									<div key={index} className="border border-gray-200 dark:border-border-dark rounded-lg p-4 bg-gray-50 dark:bg-surface-dark-hover">
 										<div className="flex items-start justify-between mb-4">
 											<div className="flex-1">
-												<label className="block text-sm font-medium text-gray-700 mb-2">반 이름</label>
+												<label className="block text-sm font-medium text-gray-700 dark:text-text-dark-secondary mb-2">
+													반 이름
+												</label>
 												<input
 													type="text"
 													value={classInfo.className}
 													onChange={(e) => handleClassNameChange(index, e.target.value)}
 													placeholder="예: 유치부, 초등부, 고등부"
-													className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+													className="w-full px-4 py-2 border border-gray-300 dark:border-border-dark rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none bg-white dark:bg-surface-dark dark:text-text-dark-primary"
 												/>
 											</div>
 											<button
 												onClick={() => handleRemoveClass(index)}
-												className="ml-4 p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors hover:cursor-pointer"
+												className="ml-4 p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors hover:cursor-pointer"
 												title="삭제"
 											>
 												<Trash2 className="w-5 h-5" />
@@ -421,7 +495,9 @@ export default function Settings() {
 										</div>
 
 										<div>
-											<label className="block text-sm font-medium text-gray-700 mb-2">학년 선택</label>
+											<label className="block text-sm font-medium text-gray-700 dark:text-text-dark-secondary mb-2">
+												학년 선택
+											</label>
 											<div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
 												{AVAILABLE_GRADES.map((grade) => (
 													<button
@@ -429,8 +505,8 @@ export default function Settings() {
 														onClick={() => handleGradeToggle(index, grade)}
 														className={`px-3 py-2 rounded-lg font-medium text-sm transition-all hover:cursor-pointer ${
 															classInfo.grades.includes(grade)
-																? 'bg-blue-600 text-white shadow-md hover:bg-blue-700'
-																: 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+																? 'bg-primary-500 text-white shadow-md hover:bg-primary-600'
+																: 'bg-white dark:bg-surface-dark text-gray-700 dark:text-text-dark-primary border border-gray-300 dark:border-border-dark hover:bg-gray-50 dark:hover:bg-surface-dark-hover'
 														}`}
 													>
 														{grade}
@@ -445,16 +521,18 @@ export default function Settings() {
 					</div>
 
 					{/* Save Button */}
-					<div className="flex items-center justify-between bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+					<div className="flex items-center justify-between bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-border-dark shadow-sm p-6">
 						<div>
 							{hasUnsavedChanges && (
-								<p className="text-sm text-amber-600 font-medium">저장되지 않은 변경사항이 있습니다</p>
+								<p className="text-sm text-amber-600 dark:text-amber-400 font-medium">
+									저장되지 않은 변경사항이 있습니다
+								</p>
 							)}
 						</div>
 						<button
 							onClick={handleSave}
 							disabled={isSaving || !hasUnsavedChanges}
-							className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed hover:cursor-pointer"
+							className="inline-flex items-center gap-2 px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-lg transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed hover:cursor-pointer"
 						>
 							{isSaving ? (
 								<>
@@ -475,14 +553,16 @@ export default function Settings() {
 			{/* Navigation Confirmation Modal */}
 			{showNavigationModal && (
 				<div className="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50 p-4">
-					<div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+					<div className="bg-white dark:bg-surface-dark rounded-2xl shadow-2xl max-w-md w-full p-6">
 						<div className="flex items-start gap-4 mb-6">
-							<div className="p-3 bg-amber-100 rounded-full">
-								<AlertTriangle className="w-6 h-6 text-amber-600" />
+							<div className="p-3 bg-amber-100 dark:bg-amber-900/30 rounded-full">
+								<AlertTriangle className="w-6 h-6 text-amber-600 dark:text-amber-400" />
 							</div>
 							<div>
-								<h3 className="text-lg font-semibold text-gray-900 mb-2">저장되지 않은 변경사항</h3>
-								<p className="text-sm text-gray-600">
+								<h3 className="text-lg font-semibold text-gray-900 dark:text-text-dark-primary mb-2">
+									저장되지 않은 변경사항
+								</h3>
+								<p className="text-sm text-gray-600 dark:text-text-dark-secondary">
 									변경사항을 저장하지 않고 페이지를 나가시겠습니까? 저장하지 않은 내용은 모두 사라집니다.
 								</p>
 							</div>
@@ -490,13 +570,13 @@ export default function Settings() {
 						<div className="flex gap-3">
 							<button
 								onClick={handleCancelNavigation}
-								className="flex-1 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors hover:cursor-pointer"
+								className="flex-1 px-4 py-2.5 bg-gray-100 dark:bg-surface-dark-hover hover:bg-gray-200 dark:hover:bg-surface-dark-active text-gray-700 dark:text-text-dark-primary font-medium rounded-lg transition-colors hover:cursor-pointer"
 							>
 								취소
 							</button>
 							<button
 								onClick={handleDiscardChanges}
-								className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors hover:cursor-pointer"
+								className="flex-1 px-4 py-2.5 bg-red-600 dark:bg-red-700 hover:bg-red-700 dark:hover:bg-red-800 text-white font-medium rounded-lg transition-colors hover:cursor-pointer"
 							>
 								나가기
 							</button>

@@ -131,7 +131,7 @@ export default function AddStudentModal({ onClose, onSubmit, student = null }) {
 										className={`w-full px-4 py-2.5 border rounded-lg transition-all outline-none disabled:bg-gray-50 disabled:cursor-not-allowed ${
 											errors.fullName
 												? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-transparent'
-												: 'border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+												: 'border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent'
 										}`}
 										placeholder="학생 이름을 입력하세요"
 									/>
@@ -149,7 +149,7 @@ export default function AddStudentModal({ onClose, onSubmit, student = null }) {
 										value={formData.christianName}
 										onChange={(e) => handleChange('christianName', e.target.value)}
 										disabled={isSubmitting}
-										className="w-full px-4 py-2.5 border border-gray-300 rounded-lg transition-all outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed"
+										className="w-full px-4 py-2.5 border border-gray-300 rounded-lg transition-all outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed"
 										placeholder="세례명을 입력하세요 (선택사항)"
 									/>
 								</div>
@@ -164,7 +164,7 @@ export default function AddStudentModal({ onClose, onSubmit, student = null }) {
 										value={formData.nameDayMonth}
 										onChange={(e) => handleChange('nameDayMonth', e.target.value)}
 										disabled={isSubmitting}
-										className="w-full px-4 py-2.5 border border-gray-300 rounded-lg transition-all outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed"
+										className="w-full px-4 py-2.5 border border-gray-300 rounded-lg transition-all outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed"
 									>
 										<option value="">축일 월 선택 (선택사항)</option>
 										{months.map((month) => (
@@ -188,7 +188,7 @@ export default function AddStudentModal({ onClose, onSubmit, student = null }) {
 										className={`w-full px-4 py-2.5 border rounded-lg transition-all outline-none disabled:bg-gray-50 disabled:cursor-not-allowed ${
 											errors.grade
 												? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-transparent'
-												: 'border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+												: 'border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent'
 										}`}
 									>
 										<option value="">학년 선택</option>
@@ -212,7 +212,7 @@ export default function AddStudentModal({ onClose, onSubmit, student = null }) {
 												key={gender}
 												className={`flex-1 flex items-center justify-center px-4 py-2.5 border rounded-lg cursor-pointer transition-all ${
 													formData.gender === gender
-														? 'border-blue-600 bg-blue-50 text-blue-700'
+														? 'border-primary-600 bg-primary-50 text-primary-700'
 														: 'border-gray-300 bg-white text-gray-700 hover:border-gray-400 hover:bg-gray-50'
 												} ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''} ${
 													errors.gender ? 'border-red-500' : ''
@@ -253,7 +253,7 @@ export default function AddStudentModal({ onClose, onSubmit, student = null }) {
 										value={formData.motherName}
 										onChange={(e) => handleChange('motherName', e.target.value)}
 										disabled={isSubmitting}
-										className="w-full px-4 py-2.5 border border-gray-300 rounded-lg transition-all outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed"
+										className="w-full px-4 py-2.5 border border-gray-300 rounded-lg transition-all outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed"
 										placeholder="어머니 성함을 입력하세요 (선택사항)"
 									/>
 								</div>
@@ -269,7 +269,7 @@ export default function AddStudentModal({ onClose, onSubmit, student = null }) {
 										value={formData.motherContact}
 										onChange={(e) => handleChange('motherContact', e.target.value)}
 										disabled={isSubmitting}
-										className="w-full px-4 py-2.5 border border-gray-300 rounded-lg transition-all outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed"
+										className="w-full px-4 py-2.5 border border-gray-300 rounded-lg transition-all outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed"
 										placeholder="연락처를 입력하세요 (선택사항)"
 									/>
 								</div>
@@ -285,7 +285,7 @@ export default function AddStudentModal({ onClose, onSubmit, student = null }) {
 										value={formData.fatherName}
 										onChange={(e) => handleChange('fatherName', e.target.value)}
 										disabled={isSubmitting}
-										className="w-full px-4 py-2.5 border border-gray-300 rounded-lg transition-all outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed"
+										className="w-full px-4 py-2.5 border border-gray-300 rounded-lg transition-all outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed"
 										placeholder="아버지 성함을 입력하세요 (선택사항)"
 									/>
 								</div>
@@ -301,7 +301,7 @@ export default function AddStudentModal({ onClose, onSubmit, student = null }) {
 										value={formData.fatherContact}
 										onChange={(e) => handleChange('fatherContact', e.target.value)}
 										disabled={isSubmitting}
-										className="w-full px-4 py-2.5 border border-gray-300 rounded-lg transition-all outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed"
+										className="w-full px-4 py-2.5 border border-gray-300 rounded-lg transition-all outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed"
 										placeholder="연락처를 입력하세요 (선택사항)"
 									/>
 								</div>
@@ -321,7 +321,7 @@ export default function AddStudentModal({ onClose, onSubmit, student = null }) {
 							<button
 								type="submit"
 								disabled={isSubmitting}
-								className="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors shadow-sm hover:shadow-md disabled:bg-blue-400 disabled:cursor-not-allowed cursor-pointer"
+								className="flex-1 px-4 py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors shadow-sm hover:shadow-md disabled:bg-primary-400 disabled:cursor-not-allowed cursor-pointer"
 							>
 								{isEditMode ? (isSubmitting ? '수정 중...' : '수정 완료') : (isSubmitting ? '추가 중...' : '학생 추가')}
 							</button>

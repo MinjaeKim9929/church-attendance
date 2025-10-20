@@ -32,7 +32,7 @@ export default function Students() {
 	}, []);
 
 	// Assign permanent numbers to all students based on grade + name
-	const studentsWithNumbers = students.map((student, index, array) => {
+	const studentsWithNumbers = students.map((student, _index, array) => {
 		// Sort all students by grade then name to assign permanent numbers
 		const sortedForNumbering = [...array].sort((a, b) => {
 			const gradeA = gradeOrder.indexOf(a.grade);
@@ -205,7 +205,7 @@ export default function Students() {
 						</div>
 						<button
 							onClick={() => setIsModalOpen(true)}
-							className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors shadow-sm hover:shadow-md cursor-pointer"
+							className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors shadow-sm hover:shadow-md cursor-pointer"
 						>
 							<Plus className="w-5 h-5" />
 							<span>학생 추가</span>
@@ -221,7 +221,7 @@ export default function Students() {
 								placeholder="이름 또는 학년으로 검색..."
 								value={searchTerm}
 								onChange={(e) => setSearchTerm(e.target.value)}
-								className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+								className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
 							/>
 						</div>
 					</div>
@@ -234,7 +234,7 @@ export default function Students() {
 					{/* Loading State */}
 					{isLoading ? (
 						<div className="flex items-center justify-center py-12">
-							<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+							<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
 						</div>
 					) : (
 						<>
@@ -258,7 +258,7 @@ export default function Students() {
 										setSortBy(e.target.value);
 										setSortOrder('asc');
 									}}
-									className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-white"
+									className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none bg-white"
 								>
 									<option value="grade">학년순</option>
 									<option value="name">이름순</option>
@@ -276,7 +276,7 @@ export default function Students() {
 									{!searchTerm && (
 										<button
 											onClick={() => setIsModalOpen(true)}
-											className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+											className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors"
 										>
 											<Plus className="w-5 h-5" />
 											<span>첫 번째 학생 추가하기</span>
@@ -370,7 +370,7 @@ export default function Students() {
 																<div className="flex items-center justify-center gap-2">
 																	<button
 																		onClick={(e) => handleEditClick(e, student)}
-																		className="p-1.5 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+																		className="p-1.5 text-gray-600 hover:text-primary-600 hover:bg-primary-50 rounded transition-colors"
 																		title="수정"
 																	>
 																		<Edit2 className="w-4 h-4" />
@@ -411,7 +411,7 @@ export default function Students() {
 															<p className="text-sm text-gray-600 ml-8">{student.christianName}</p>
 														)}
 													</div>
-													<span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+													<span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
 														{student.grade}
 													</span>
 												</div>
@@ -431,7 +431,7 @@ export default function Students() {
 													<div className="flex items-center gap-1">
 														<button
 															onClick={(e) => handleEditClick(e, student)}
-															className="p-1.5 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+															className="p-1.5 text-gray-600 hover:text-primary-600 hover:bg-primary-50 rounded transition-colors"
 															title="수정"
 														>
 															<Edit2 className="w-4 h-4" />

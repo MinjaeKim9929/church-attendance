@@ -156,7 +156,7 @@ export default function SignUpPage() {
 				<div className="bg-white rounded-lg shadow-lg p-6 sm:p-8 border border-gray-100">
 					{/* Header */}
 					<div className="text-center mb-3 sm:mb-5">
-						<div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-blue-600 rounded-full mb-3 sm:mb-4">
+						<div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-primary-600 rounded-full mb-3 sm:mb-4">
 							<svg className="w-7 h-7 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path
 									strokeLinecap="round"
@@ -190,7 +190,7 @@ export default function SignUpPage() {
 								className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base border rounded-lg transition-all outline-none disabled:bg-gray-50 disabled:cursor-not-allowed ${
 									errors.fullName && touched.fullName
 										? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-transparent'
-										: 'border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+										: 'border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent'
 								}`}
 								placeholder="John Doe"
 							/>
@@ -213,7 +213,7 @@ export default function SignUpPage() {
 								className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base border rounded-lg transition-all outline-none disabled:bg-gray-50 disabled:cursor-not-allowed ${
 									errors.email && touched.email
 										? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-transparent'
-										: 'border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+										: 'border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent'
 								}`}
 								placeholder="your.email@example.com"
 							/>
@@ -236,7 +236,7 @@ export default function SignUpPage() {
 								className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 pr-10 sm:pr-12 text-sm sm:text-base border rounded-lg transition-all outline-none disabled:bg-gray-50 disabled:cursor-not-allowed ${
 									errors.password && touched.password
 										? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-transparent'
-										: 'border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+										: 'border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent'
 								}`}
 								placeholder="Create a password"
 							/>
@@ -262,7 +262,7 @@ export default function SignUpPage() {
 								className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 pr-10 sm:pr-12 text-sm sm:text-base border rounded-lg transition-all outline-none disabled:bg-gray-50 disabled:cursor-not-allowed ${
 									errors.confirmPassword && touched.confirmPassword
 										? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-transparent'
-										: 'border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+										: 'border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent'
 								}`}
 								placeholder="Re-enter your password"
 							/>
@@ -274,7 +274,7 @@ export default function SignUpPage() {
 						<button
 							type="submit"
 							disabled={authLoading}
-							className="w-full bg-blue-600 hover:bg-blue-700 hover:cursor-pointer text-white font-medium py-2 sm:py-2.5 text-sm sm:text-base rounded-lg transition-colors shadow-sm hover:shadow-md mt-2 disabled:bg-blue-400 disabled:cursor-not-allowed"
+							className="w-full bg-primary-600 hover:bg-primary-700 hover:cursor-pointer text-white font-medium py-2 sm:py-2.5 text-sm sm:text-base rounded-lg transition-colors shadow-sm hover:shadow-md mt-2 disabled:bg-primary-400 disabled:cursor-not-allowed"
 						>
 							{authLoading ? 'Creating Account...' : 'Create Account'}
 						</button>
@@ -286,7 +286,7 @@ export default function SignUpPage() {
 							Already have an account?{' '}
 							<a
 								href="/login"
-								className="text-blue-600 hover:text-blue-700 hover:underline font-medium transition-colors"
+								className="text-primary-600 hover:text-primary-700 hover:underline font-medium transition-colors"
 							>
 								Sign in
 							</a>

@@ -92,7 +92,7 @@ export default function StudentDetail() {
 				<main className="flex-1 overflow-y-auto">
 					<div className="p-6 sm:p-8 lg:pl-8 pt-16 lg:pt-6">
 						<div className="flex items-center justify-center py-12">
-							<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+							<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
 						</div>
 					</div>
 				</main>

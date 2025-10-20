@@ -35,11 +35,11 @@ export default function Toast({ message, type = 'success', onClose, duration = 3
 			iconColor: 'text-amber-600',
 		},
 		info: {
-			bg: 'bg-blue-50',
-			border: 'border-blue-200',
-			text: 'text-blue-700',
+			bg: 'bg-primary-50',
+			border: 'border-primary-200',
+			text: 'text-primary-700',
 			icon: AlertCircle,
-			iconColor: 'text-blue-600',
+			iconColor: 'text-primary-600',
 		},
 	};
 

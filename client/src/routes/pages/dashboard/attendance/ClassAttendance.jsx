@@ -181,7 +181,7 @@ export default function ClassAttendance() {
 					<div className="mb-6">
 						<button
 							onClick={() => navigate('/dashboard/attendance')}
-							className="inline-flex items-center gap-2 text-gray-600 hover:text-blue-600 mb-4 transition-colors hover:cursor-pointer"
+							className="inline-flex items-center gap-2 text-gray-600 hover:text-primary-600 mb-4 transition-colors hover:cursor-pointer"
 						>
 							<ArrowLeft className="w-4 h-4" />
 							<span className="text-sm font-medium">반 선택으로 돌아가기</span>
@@ -215,7 +215,7 @@ export default function ClassAttendance() {
 										type="date"
 										value={selectedDate}
 										onChange={(e) => setSelectedDate(e.target.value)}
-										className="pl-10 pr-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm shadow-sm hover:cursor-pointer hover:border-gray-400 transition-colors w-[160px]"
+										className="pl-10 pr-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none text-sm shadow-sm hover:cursor-pointer hover:border-gray-400 transition-colors w-[160px]"
 									/>
 								</div>
 								<button
@@ -233,7 +233,7 @@ export default function ClassAttendance() {
 								</button>
 								<button
 									onClick={() => setSelectedDate(new Date().toISOString().split('T')[0])}
-									className="px-3 py-2.5 bg-blue-50 text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-100 hover:cursor-pointer transition-colors text-xs font-semibold shadow-sm whitespace-nowrap"
+									className="px-3 py-2.5 bg-primary-50 text-primary-600 border border-primary-200 rounded-lg hover:bg-primary-100 hover:cursor-pointer transition-colors text-xs font-semibold shadow-sm whitespace-nowrap"
 									title="오늘"
 								>
 									오늘
@@ -246,8 +246,8 @@ export default function ClassAttendance() {
 					<div className="grid grid-cols-3 gap-3 sm:gap-4 mb-6">
 						<div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-5 shadow-sm">
 							<div className="flex flex-col items-center text-center sm:flex-row sm:text-left sm:gap-3">
-								<div className="p-2 sm:p-2.5 bg-blue-50 rounded-lg mb-2 sm:mb-0">
-									<UsersIcon className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+								<div className="p-2 sm:p-2.5 bg-primary-50 rounded-lg mb-2 sm:mb-0">
+									<UsersIcon className="w-4 h-4 sm:w-5 sm:h-5 text-primary-600" />
 								</div>
 								<div>
 									<p className="text-xs sm:text-sm text-gray-600 font-medium">총 인원</p>
@@ -308,7 +308,7 @@ export default function ClassAttendance() {
 					{/* Loading State */}
 					{isLoading ? (
 						<div className="flex items-center justify-center py-12">
-							<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+							<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
 						</div>
 					) : (
 						<>
@@ -394,7 +394,7 @@ export default function ClassAttendance() {
 									<button
 										onClick={handleSave}
 										disabled={isSaving}
-										className="w-full sm:w-auto min-w-[140px] px-8 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed hover:cursor-pointer flex items-center justify-center gap-2"
+										className="w-full sm:w-auto min-w-[140px] px-8 py-3.5 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed hover:cursor-pointer flex items-center justify-center gap-2"
 									>
 										{isSaving ? (
 											<>

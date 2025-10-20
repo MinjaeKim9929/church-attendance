@@ -28,7 +28,7 @@ export default function NotFound() {
 					<div className="space-y-3">
 						<Link
 							to="/dashboard"
-							className="block w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 sm:py-2.5 text-sm sm:text-base rounded-lg transition-colors shadow-sm hover:shadow-md text-center"
+							className="block w-full bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 sm:py-2.5 text-sm sm:text-base rounded-lg transition-colors shadow-sm hover:shadow-md text-center"
 						>
 							Go to Home
 						</Link>
