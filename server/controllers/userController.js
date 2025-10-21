@@ -243,4 +243,17 @@ const updatePassword = async (req, res) => {
 	}
 };
 
-module.exports = { signup, login, logout, checkAuth, getSettings, updateSettings, updatePassword };
+// @desc    Get all users (admin only)
+// @route   GET /api/auth/users
+// @access  Protected (Admin only)
+const getAllUsers = async (req, res) => {
+	try {
+		const users = await User.find().select('-password').sort({ fullName: 1 });
+		res.status(200).json(users);
+	} catch (error) {
+		console.error('Error in getAllUsers controller:', error.message);
+		res.status(500).json({ message: 'Internal server error' });
+	}
+};
+
+module.exports = { signup, login, logout, checkAuth, getSettings, updateSettings, updatePassword, getAllUsers };

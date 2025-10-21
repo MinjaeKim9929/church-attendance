@@ -7,6 +7,14 @@ import Toast from '../../../../components/Toast';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
+// Helper function to get local date string in YYYY-MM-DD format
+const getLocalDateString = (date = new Date()) => {
+	const year = date.getFullYear();
+	const month = String(date.getMonth() + 1).padStart(2, '0');
+	const day = String(date.getDate()).padStart(2, '0');
+	return `${year}-${month}-${day}`;
+};
+
 export default function ClassAttendance() {
 	const { id } = useParams();
 	const navigate = useNavigate();
@@ -15,7 +23,7 @@ export default function ClassAttendance() {
 
 	const [students, setStudents] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
-	const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+	const [selectedDate, setSelectedDate] = useState(getLocalDateString());
 	const [attendance, setAttendance] = useState({});
 	const [isSaving, setIsSaving] = useState(false);
 	const [toast, setToast] = useState(null);
@@ -39,10 +47,16 @@ export default function ClassAttendance() {
 				withCredentials: true,
 			});
 
-			// Filter students by class grades
+			// Filter students by class configuration
 			let filteredStudents = response.data;
-			if (classInfo && classInfo.grades) {
-				filteredStudents = response.data.filter((student) => classInfo.grades.includes(student.grade));
+			if (classInfo) {
+				if (classInfo.selectionMode === 'students' && classInfo.students) {
+					// Filter by specific student IDs
+					filteredStudents = response.data.filter((student) => classInfo.students.includes(student._id));
+				} else if (classInfo.grades) {
+					// Filter by grades
+					filteredStudents = response.data.filter((student) => classInfo.grades.includes(student.grade));
+				}
 			}
 
 			// Sort by grade then name
@@ -76,16 +90,18 @@ export default function ClassAttendance() {
 
 	const fetchAttendanceForDate = async () => {
 		try {
-			// Fetch attendance records for the selected date
+			// Fetch attendance records for the selected date and class
 			const response = await axios.get(`${API_URL}/attendance/date/${selectedDate}`, {
 				withCredentials: true,
 			});
 
-			// Create a map of existing attendance by studentId
+			// Create a map of existing attendance by studentId, filtered by current class
 			const attendanceMap = {};
-			response.data.attendanceRecords.forEach((record) => {
-				attendanceMap[record.studentId._id] = record.status === 'Present';
-			});
+			response.data.attendanceRecords
+				.filter((record) => record.class === classInfo.name) // Filter by current class
+				.forEach((record) => {
+					attendanceMap[record.studentId._id] = record.status === 'Present';
+				});
 
 			// Update attendance state: use existing records or null if not saved
 			const updatedAttendance = {};
@@ -144,6 +160,7 @@ export default function ClassAttendance() {
 				{
 					date: selectedDate,
 					attendanceRecords,
+					className: classInfo.name, // Pass class name for multi-class attendance tracking
 				},
 				{
 					withCredentials: true,
@@ -196,9 +213,9 @@ export default function ClassAttendance() {
 							<div className="flex items-center justify-center sm:justify-end gap-2">
 								<button
 									onClick={() => {
-										const yesterday = new Date(selectedDate);
-										yesterday.setDate(yesterday.getDate() - 1);
-										setSelectedDate(yesterday.toISOString().split('T')[0]);
+										const [year, month, day] = selectedDate.split('-').map(Number);
+										const yesterday = new Date(year, month - 1, day - 1);
+										setSelectedDate(getLocalDateString(yesterday));
 									}}
 									className="p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:cursor-pointer transition-colors shadow-sm"
 									title="이전 날"
@@ -218,9 +235,9 @@ export default function ClassAttendance() {
 								</div>
 								<button
 									onClick={() => {
-										const tomorrow = new Date(selectedDate);
-										tomorrow.setDate(tomorrow.getDate() + 1);
-										setSelectedDate(tomorrow.toISOString().split('T')[0]);
+										const [year, month, day] = selectedDate.split('-').map(Number);
+										const tomorrow = new Date(year, month - 1, day + 1);
+										setSelectedDate(getLocalDateString(tomorrow));
 									}}
 									className="p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:cursor-pointer transition-colors shadow-sm"
 									title="다음 날"
@@ -230,7 +247,7 @@ export default function ClassAttendance() {
 									</svg>
 								</button>
 								<button
-									onClick={() => setSelectedDate(new Date().toISOString().split('T')[0])}
+									onClick={() => setSelectedDate(getLocalDateString())}
 									className="px-3 py-2.5 bg-primary-50 text-primary-600 border border-primary-200 rounded-lg hover:bg-primary-100 hover:cursor-pointer transition-colors text-xs font-semibold shadow-sm whitespace-nowrap"
 									title="오늘"
 								>

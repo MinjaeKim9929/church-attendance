@@ -14,10 +14,22 @@ const classConfigurationSchema = new mongoose.Schema(
 					type: String,
 					required: true,
 				},
+				selectionMode: {
+					type: String,
+					enum: ['grades', 'students'],
+					default: 'grades',
+				},
 				grades: {
 					type: [String],
-					required: true,
 					enum: ['JK', 'SK', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
+				},
+				students: {
+					type: [mongoose.Schema.Types.ObjectId],
+					ref: 'Student',
+				},
+				teachers: {
+					type: [mongoose.Schema.Types.ObjectId],
+					ref: 'User',
 				},
 			},
 		],

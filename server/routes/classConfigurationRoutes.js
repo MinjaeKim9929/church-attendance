@@ -6,15 +6,17 @@ const {
 	deleteClassConfig,
 	getCurrentSchoolYear,
 } = require('../controllers/classConfigurationController');
-const { protect } = require('../middleware/auth');
+const { protect, adminOnly } = require('../middleware/auth');
 
 const router = express.Router();
 
-// All routes are protected
-router.post('/', protect, createOrUpdateClassConfig);
+// Public routes (all authenticated users can read)
 router.get('/current/year', protect, getCurrentSchoolYear);
 router.get('/:schoolYear', protect, getClassConfig);
 router.get('/', protect, getAllClassConfigs);
-router.delete('/:schoolYear', protect, deleteClassConfig);
+
+// Admin-only routes (creating, updating, deleting)
+router.post('/', protect, adminOnly, createOrUpdateClassConfig);
+router.delete('/:schoolYear', protect, adminOnly, deleteClassConfig);
 
 module.exports = router;

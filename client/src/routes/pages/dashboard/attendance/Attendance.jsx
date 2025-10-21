@@ -69,8 +69,10 @@ export default function Attendance() {
 					...(classConfig.classes || []).map((cls, index) => ({
 						id: cls._id || `class-${index}`,
 						name: cls.className,
-						grades: cls.grades,
-						description: cls.grades.join(', ') + '학년',
+						selectionMode: cls.selectionMode || 'grades',
+						grades: cls.grades || [],
+						students: cls.students || [],
+						description: cls.selectionMode === 'students' ? `${cls.students?.length || 0}명의 학생` : cls.grades.join(', ') + '학년',
 						color: colorPalette[index % colorPalette.length].color,
 						iconColor: colorPalette[index % colorPalette.length].iconColor,
 					})),

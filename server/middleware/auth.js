@@ -35,4 +35,22 @@ const protect = async (req, res, next) => {
 	}
 };
 
-module.exports = { protect };
+const adminOnly = async (req, res, next) => {
+	try {
+		// Check if user exists and is admin
+		if (!req.user) {
+			return res.status(401).json({ message: 'Not authorized, no user' });
+		}
+
+		if (req.user.role !== 'admin') {
+			return res.status(403).json({ message: 'Access denied. Admin only.' });
+		}
+
+		next();
+	} catch (error) {
+		console.error('Error in admin middleware:', error.message);
+		res.status(403).json({ message: 'Access denied' });
+	}
+};
+
+module.exports = { protect, adminOnly };

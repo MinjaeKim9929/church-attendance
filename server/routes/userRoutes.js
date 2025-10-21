@@ -1,6 +1,6 @@
 const express = require('express');
-const { signup, login, logout, checkAuth, getSettings, updateSettings, updatePassword } = require('../controllers/userController');
-const { protect } = require('../middleware/auth');
+const { signup, login, logout, checkAuth, getSettings, updateSettings, updatePassword, getAllUsers } = require('../controllers/userController');
+const { protect, adminOnly } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -16,5 +16,8 @@ router.get('/me', protect, checkAuth);
 router.get('/settings', protect, getSettings);
 router.put('/settings', protect, updateSettings);
 router.put('/settings/password', protect, updatePassword);
+
+// Admin only routes
+router.get('/users', protect, adminOnly, getAllUsers);
 
 module.exports = router;

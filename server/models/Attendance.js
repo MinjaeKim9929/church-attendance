@@ -40,8 +40,8 @@ const getAttendanceModel = (schoolYear) => {
 		{ timestamps: true }
 	);
 
-	// Create compound index to ensure one attendance record per student per date
-	attendanceSchema.index({ studentId: 1, date: 1 }, { unique: true });
+	// Create compound index to ensure one attendance record per student per date per class
+	attendanceSchema.index({ studentId: 1, date: 1, class: 1 }, { unique: true });
 
 	// Create model with dynamic collection name
 	return mongoose.model(collectionName, attendanceSchema, collectionName);

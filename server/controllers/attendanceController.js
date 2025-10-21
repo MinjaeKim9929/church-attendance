@@ -67,12 +67,16 @@ const createAttendance = async (req, res) => {
 // @access  Protected
 const bulkCreateAttendance = async (req, res) => {
 	try {
-		const { date, attendanceRecords, schoolYear } = req.body;
+		const { date, attendanceRecords, schoolYear, className } = req.body;
 		// attendanceRecords format: [{ studentId, status }, { studentId, status }, ...]
 
 		// Validation
 		if (!date || !attendanceRecords || !Array.isArray(attendanceRecords)) {
 			return res.status(400).json({ message: 'Please provide date and attendance records array' });
+		}
+
+		if (!className) {
+			return res.status(400).json({ message: 'Please provide className' });
 		}
 
 		// Determine school year (use provided or auto-calculate)
@@ -103,30 +107,23 @@ const bulkCreateAttendance = async (req, res) => {
 					continue;
 				}
 
-				// Get student to calculate class
+				// Verify student exists
 				const student = await Student.findById(studentId);
 				if (!student) {
 					results.errors.push({ studentId, message: 'Student not found' });
 					continue;
 				}
 
-				// Calculate class from student's grade using configuration
-				const studentClass = getClassFromGradeAndConfig(student.grade, classConfig);
-				if (!studentClass) {
-					results.errors.push({ studentId, message: `Student's grade (${student.grade}) not assigned to any class` });
-					continue;
-				}
-
-				// Check if attendance already exists for this student on this date
+				// Check if attendance already exists for this student on this date for this class
 				const existingAttendance = await Attendance.findOne({
 					studentId,
 					date: new Date(date),
+					class: className,
 				});
 
 				if (existingAttendance) {
 					// Update existing record
 					existingAttendance.status = status;
-					existingAttendance.class = studentClass;
 					existingAttendance.recordedBy = req.user._id;
 					await existingAttendance.save();
 					await existingAttendance.populate('studentId', 'fullName grade');
@@ -137,7 +134,7 @@ const bulkCreateAttendance = async (req, res) => {
 					const attendance = await Attendance.create({
 						studentId,
 						date: new Date(date),
-						class: studentClass,
+						class: className,
 						status,
 						recordedBy: req.user._id,
 					});
