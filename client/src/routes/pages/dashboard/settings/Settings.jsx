@@ -607,29 +607,31 @@ export default function Settings() {
 					</div>
 
 					{/* Save Button */}
-					<div className="flex items-center justify-between bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-						<div>
-							{hasUnsavedChanges && (
-								<p className="text-sm text-amber-600 font-medium">저장되지 않은 변경사항이 있습니다</p>
-							)}
+					<div className="sticky bottom-0 bg-gradient-to-t from-gray-50 via-gray-50 to-transparent pt-6 pb-4">
+						<div className="flex items-center justify-between">
+							<div>
+								{hasUnsavedChanges && (
+									<p className="text-sm text-amber-600 font-medium">저장되지 않은 변경사항이 있습니다</p>
+								)}
+							</div>
+							<button
+								onClick={handleSave}
+								disabled={isSaving || !hasUnsavedChanges}
+								className="w-full sm:w-auto min-w-[140px] px-8 py-3.5 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed hover:cursor-pointer flex items-center justify-center gap-2"
+							>
+								{isSaving ? (
+									<>
+										<div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+										<span>저장 중...</span>
+									</>
+								) : (
+									<>
+										<Save className="w-5 h-5" />
+										<span>저장</span>
+									</>
+								)}
+							</button>
 						</div>
-						<button
-							onClick={handleSave}
-							disabled={isSaving || !hasUnsavedChanges}
-							className="inline-flex items-center gap-2 px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-lg transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed hover:cursor-pointer"
-						>
-							{isSaving ? (
-								<>
-									<div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-									<span>저장 중...</span>
-								</>
-							) : (
-								<>
-									<Save className="w-5 h-5" />
-									<span>저장</span>
-								</>
-							)}
-						</button>
 					</div>
 				</div>
 			</main>
