@@ -63,8 +63,24 @@ export default function Settings() {
 
 	useEffect(() => {
 		// Check if there are unsaved changes
+		// Exclude preferences (theme and language) from comparison since they auto-save
 		const classesChanged = JSON.stringify(classes) !== JSON.stringify(originalClasses);
-		const userSettingsChanged = JSON.stringify(userSettings) !== JSON.stringify(originalUserSettings);
+
+		const userSettingsWithoutPreferences = {
+			fullName: userSettings.fullName,
+			email: userSettings.email,
+			phone: userSettings.phone,
+		};
+		const originalUserSettingsWithoutPreferences = originalUserSettings
+			? {
+					fullName: originalUserSettings.fullName,
+					email: originalUserSettings.email,
+					phone: originalUserSettings.phone,
+			  }
+			: null;
+
+		const userSettingsChanged =
+			JSON.stringify(userSettingsWithoutPreferences) !== JSON.stringify(originalUserSettingsWithoutPreferences);
 		setHasUnsavedChanges(classesChanged || userSettingsChanged);
 	}, [classes, originalClasses, userSettings, originalUserSettings]);
 
@@ -181,24 +197,16 @@ export default function Settings() {
 
 		setIsSaving(true);
 		try {
-			// Save user settings
+			// Save user settings (excluding preferences as they auto-save)
 			await axios.put(
 				`${API_URL}/auth/settings`,
 				{
 					fullName: userSettings.fullName,
 					phone: userSettings.phone,
-					preferences: userSettings.preferences,
 				},
 				{
 					withCredentials: true,
 				}
-			);
-
-			// Dispatch event to notify Sidebar of saved preferences
-			window.dispatchEvent(
-				new CustomEvent('preferencesUpdated', {
-					detail: userSettings.preferences,
-				})
 			);
 
 			// Save class configuration
@@ -270,9 +278,6 @@ export default function Settings() {
 					{/* Header */}
 					<div className="mb-6">
 						<h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">설정</h1>
-						<p className="text-sm text-gray-600">
-							학년도: <span className="font-semibold">{schoolYear}</span>
-						</p>
 					</div>
 
 					{/* Toast Notification */}
@@ -309,9 +314,7 @@ export default function Settings() {
 
 							{/* Phone */}
 							<div>
-								<label className="block text-sm font-medium text-gray-700 mb-2">
-									전화번호
-								</label>
+								<label className="block text-sm font-medium text-gray-700 mb-2">전화번호</label>
 								<input
 									type="tel"
 									value={userSettings.phone}
@@ -324,23 +327,38 @@ export default function Settings() {
 							{/* Theme */}
 							<div>
 								<label className="block text-sm font-medium text-gray-700 mb-2">
-									테마
+									테마 <span className="text-xs text-gray-500">(자동 저장)</span>
 								</label>
 								<div className="grid grid-cols-3 gap-3">
 									<button
 										type="button"
-										onClick={() => {
+										onClick={async () => {
+											const updatedPreferences = { ...userSettings.preferences, theme: 'light' };
 											const updatedSettings = {
 												...userSettings,
-												preferences: { ...userSettings.preferences, theme: 'light' },
+												preferences: updatedPreferences,
 											};
 											setUserSettings(updatedSettings);
+
 											// Dispatch event to notify Sidebar
 											window.dispatchEvent(
 												new CustomEvent('preferencesUpdated', {
-													detail: updatedSettings.preferences,
+													detail: updatedPreferences,
 												})
 											);
+
+											// Auto-save to backend
+											try {
+												await axios.put(
+													`${API_URL}/auth/settings`,
+													{ preferences: updatedPreferences },
+													{ withCredentials: true }
+												);
+												// Update original settings to prevent unsaved changes warning
+												setOriginalUserSettings(updatedSettings);
+											} catch (error) {
+												console.error('Failed to save theme preference:', error);
+											}
 										}}
 										className={`px-4 py-3 rounded-lg font-medium text-sm transition-all border-2 hover:cursor-pointer ${
 											userSettings.preferences.theme === 'light'
@@ -352,18 +370,33 @@ export default function Settings() {
 									</button>
 									<button
 										type="button"
-										onClick={() => {
+										onClick={async () => {
+											const updatedPreferences = { ...userSettings.preferences, theme: 'dark' };
 											const updatedSettings = {
 												...userSettings,
-												preferences: { ...userSettings.preferences, theme: 'dark' },
+												preferences: updatedPreferences,
 											};
 											setUserSettings(updatedSettings);
+
 											// Dispatch event to notify Sidebar
 											window.dispatchEvent(
 												new CustomEvent('preferencesUpdated', {
-													detail: updatedSettings.preferences,
+													detail: updatedPreferences,
 												})
 											);
+
+											// Auto-save to backend
+											try {
+												await axios.put(
+													`${API_URL}/auth/settings`,
+													{ preferences: updatedPreferences },
+													{ withCredentials: true }
+												);
+												// Update original settings to prevent unsaved changes warning
+												setOriginalUserSettings(updatedSettings);
+											} catch (error) {
+												console.error('Failed to save theme preference:', error);
+											}
 										}}
 										className={`px-4 py-3 rounded-lg font-medium text-sm transition-all border-2 hover:cursor-pointer ${
 											userSettings.preferences.theme === 'dark'
@@ -375,18 +408,33 @@ export default function Settings() {
 									</button>
 									<button
 										type="button"
-										onClick={() => {
+										onClick={async () => {
+											const updatedPreferences = { ...userSettings.preferences, theme: 'auto' };
 											const updatedSettings = {
 												...userSettings,
-												preferences: { ...userSettings.preferences, theme: 'auto' },
+												preferences: updatedPreferences,
 											};
 											setUserSettings(updatedSettings);
+
 											// Dispatch event to notify Sidebar
 											window.dispatchEvent(
 												new CustomEvent('preferencesUpdated', {
-													detail: updatedSettings.preferences,
+													detail: updatedPreferences,
 												})
 											);
+
+											// Auto-save to backend
+											try {
+												await axios.put(
+													`${API_URL}/auth/settings`,
+													{ preferences: updatedPreferences },
+													{ withCredentials: true }
+												);
+												// Update original settings to prevent unsaved changes warning
+												setOriginalUserSettings(updatedSettings);
+											} catch (error) {
+												console.error('Failed to save theme preference:', error);
+											}
 										}}
 										className={`px-4 py-3 rounded-lg font-medium text-sm transition-all border-2 hover:cursor-pointer ${
 											userSettings.preferences.theme === 'auto'
@@ -402,23 +450,38 @@ export default function Settings() {
 							{/* Language */}
 							<div>
 								<label className="block text-sm font-medium text-gray-700 mb-2">
-									언어
+									언어 <span className="text-xs text-gray-500">(자동 저장)</span>
 								</label>
 								<div className="grid grid-cols-2 gap-3">
 									<button
 										type="button"
-										onClick={() => {
+										onClick={async () => {
+											const updatedPreferences = { ...userSettings.preferences, language: 'ko' };
 											const updatedSettings = {
 												...userSettings,
-												preferences: { ...userSettings.preferences, language: 'ko' },
+												preferences: updatedPreferences,
 											};
 											setUserSettings(updatedSettings);
+
 											// Dispatch event to notify Sidebar
 											window.dispatchEvent(
 												new CustomEvent('preferencesUpdated', {
-													detail: updatedSettings.preferences,
+													detail: updatedPreferences,
 												})
 											);
+
+											// Auto-save to backend
+											try {
+												await axios.put(
+													`${API_URL}/auth/settings`,
+													{ preferences: updatedPreferences },
+													{ withCredentials: true }
+												);
+												// Update original settings to prevent unsaved changes warning
+												setOriginalUserSettings(updatedSettings);
+											} catch (error) {
+												console.error('Failed to save language preference:', error);
+											}
 										}}
 										className={`px-4 py-3 rounded-lg font-medium text-sm transition-all border-2 hover:cursor-pointer ${
 											userSettings.preferences.language === 'ko'
@@ -430,18 +493,33 @@ export default function Settings() {
 									</button>
 									<button
 										type="button"
-										onClick={() => {
+										onClick={async () => {
+											const updatedPreferences = { ...userSettings.preferences, language: 'en' };
 											const updatedSettings = {
 												...userSettings,
-												preferences: { ...userSettings.preferences, language: 'en' },
+												preferences: updatedPreferences,
 											};
 											setUserSettings(updatedSettings);
+
 											// Dispatch event to notify Sidebar
 											window.dispatchEvent(
 												new CustomEvent('preferencesUpdated', {
-													detail: updatedSettings.preferences,
+													detail: updatedPreferences,
 												})
 											);
+
+											// Auto-save to backend
+											try {
+												await axios.put(
+													`${API_URL}/auth/settings`,
+													{ preferences: updatedPreferences },
+													{ withCredentials: true }
+												);
+												// Update original settings to prevent unsaved changes warning
+												setOriginalUserSettings(updatedSettings);
+											} catch (error) {
+												console.error('Failed to save language preference:', error);
+											}
 										}}
 										className={`px-4 py-3 rounded-lg font-medium text-sm transition-all border-2 hover:cursor-pointer ${
 											userSettings.preferences.language === 'en'
@@ -483,15 +561,10 @@ export default function Settings() {
 						) : (
 							<div className="space-y-6">
 								{classes.map((classInfo, index) => (
-									<div
-										key={index}
-										className="border border-gray-200 rounded-lg p-4 bg-gray-50"
-									>
+									<div key={index} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
 										<div className="flex items-start justify-between mb-4">
 											<div className="flex-1">
-												<label className="block text-sm font-medium text-gray-700 mb-2">
-													반 이름
-												</label>
+												<label className="block text-sm font-medium text-gray-700 mb-2">반 이름</label>
 												<input
 													type="text"
 													value={classInfo.className}
@@ -510,9 +583,7 @@ export default function Settings() {
 										</div>
 
 										<div>
-											<label className="block text-sm font-medium text-gray-700 mb-2">
-												학년 선택
-											</label>
+											<label className="block text-sm font-medium text-gray-700 mb-2">학년 선택</label>
 											<div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
 												{AVAILABLE_GRADES.map((grade) => (
 													<button
@@ -539,9 +610,7 @@ export default function Settings() {
 					<div className="flex items-center justify-between bg-white rounded-xl border border-gray-200 shadow-sm p-6">
 						<div>
 							{hasUnsavedChanges && (
-								<p className="text-sm text-amber-600 font-medium">
-									저장되지 않은 변경사항이 있습니다
-								</p>
+								<p className="text-sm text-amber-600 font-medium">저장되지 않은 변경사항이 있습니다</p>
 							)}
 						</div>
 						<button
@@ -574,9 +643,7 @@ export default function Settings() {
 								<AlertTriangle className="w-6 h-6 text-amber-600" />
 							</div>
 							<div>
-								<h3 className="text-lg font-semibold text-gray-900 mb-2">
-									저장되지 않은 변경사항
-								</h3>
+								<h3 className="text-lg font-semibold text-gray-900 mb-2">저장되지 않은 변경사항</h3>
 								<p className="text-sm text-gray-600">
 									변경사항을 저장하지 않고 페이지를 나가시겠습니까? 저장하지 않은 내용은 모두 사라집니다.
 								</p>
