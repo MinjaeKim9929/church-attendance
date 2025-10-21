@@ -5,7 +5,7 @@ export default function Dashboard() {
 		<div className="flex h-screen bg-gray-50">
 			<Sidebar />
 			<main className="flex-1 overflow-y-auto">
-				<div className="p-6 sm:p-8 lg:pl-8 pt-20 lg:pt-7">
+				<div className="p-6 sm:p-8 lg:pl-12 lg:pr-12 pt-20 lg:pt-12">
 					<h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">대시보드</h1>
 					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 						{/* Dashboard content will go here */}

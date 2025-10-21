@@ -91,9 +91,7 @@ export default function ClassAttendance() {
 			const updatedAttendance = {};
 			students.forEach((student) => {
 				// If attendance exists for this student, use it; otherwise set to null (not saved)
-				updatedAttendance[student._id] = student._id in attendanceMap
-					? attendanceMap[student._id]
-					: null;
+				updatedAttendance[student._id] = student._id in attendanceMap ? attendanceMap[student._id] : null;
 			});
 
 			setAttendance(updatedAttendance);
@@ -173,22 +171,22 @@ export default function ClassAttendance() {
 	const absentCount = Object.values(attendance).filter((status) => status === false).length;
 
 	return (
-		<div className="flex h-screen bg-gray-50">
+		<div className="flex h-screen bg-gray-50 dark:bg-page-dark">
 			<Sidebar />
 			<main className="flex-1 overflow-y-auto">
-				<div className="p-4 sm:p-8 lg:pl-8 pt-20 lg:pt-6 max-w-7xl mx-auto">
+				<div className="p-6 sm:p-8 lg:pl-12 pt-20 lg:pt-12 lg:pr-12 max-w-7xl mx-auto">
 					{/* Header */}
 					<div className="mb-6">
 						<button
 							onClick={() => navigate('/dashboard/attendance')}
-							className="inline-flex items-center gap-2 text-gray-600 hover:text-primary-600 mb-4 transition-colors hover:cursor-pointer"
+							className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors hover:cursor-pointer mb-6"
 						>
-							<ArrowLeft className="w-4 h-4" />
-							<span className="text-sm font-medium">반 선택으로 돌아가기</span>
+							<ArrowLeft className="w-5 h-5" />
+							<span>반 선택으로 돌아가기</span>
 						</button>
 						<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 							<div>
-								<h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+								<h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
 									{classInfo?.name || '전체 학생'} 출석 관리
 								</h1>
 								<p className="text-sm text-gray-600">
@@ -296,14 +294,7 @@ export default function ClassAttendance() {
 					</div>
 
 					{/* Toast Notification */}
-					{toast && (
-						<Toast
-							message={toast.message}
-							type={toast.type}
-							onClose={() => setToast(null)}
-							duration={3000}
-						/>
-					)}
+					{toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} duration={3000} />}
 
 					{/* Loading State */}
 					{isLoading ? (

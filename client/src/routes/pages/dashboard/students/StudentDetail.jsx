@@ -87,10 +87,10 @@ export default function StudentDetail() {
 
 	if (isLoading) {
 		return (
-			<div className="flex h-screen bg-gray-50">
+			<div className="flex h-screen bg-gray-50 dark:bg-page-dark">
 				<Sidebar />
 				<main className="flex-1 overflow-y-auto">
-					<div className="p-6 sm:p-8 lg:pl-8 pt-16 lg:pt-6">
+					<div className="p-6 sm:p-8 lg:pl-12 pt-20 lg:pt-12 max-w-7xl mx-auto">
 						<div className="flex items-center justify-center py-12">
 							<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
 						</div>
@@ -105,7 +105,7 @@ export default function StudentDetail() {
 			<div className="flex h-screen bg-gray-50">
 				<Sidebar />
 				<main className="flex-1 overflow-y-auto">
-					<div className="p-6 sm:p-8 lg:pl-8 pt-16 lg:pt-6">
+					<div className="p-6 sm:p-8 lg:pl-12 pt-20 lg:pt-12 max-w-7xl mx-auto">
 						<div className="mb-6">
 							<button
 								onClick={() => navigate('/dashboard/students')}
@@ -125,15 +125,15 @@ export default function StudentDetail() {
 	}
 
 	return (
-		<div className="flex h-screen bg-gray-50">
+		<div className="flex h-screen bg-gray-50 dark:bg-page-dark">
 			<Sidebar />
 			<main className="flex-1 overflow-y-auto">
-				<div className="p-6 sm:p-8 lg:pl-8 pt-18 lg:pt-6">
+				<div className="p-6 sm:p-8 lg:pl-12 lg:pr-12 pt-20 lg:pt-12 max-w-7xl mx-auto">
 					{/* Back Button */}
 					<div className="mb-6">
 						<button
 							onClick={() => navigate('/dashboard/students')}
-							className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+							className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors hover:cursor-pointer"
 						>
 							<ArrowLeft className="w-5 h-5" />
 							<span>학생 목록으로</span>
@@ -141,9 +141,7 @@ export default function StudentDetail() {
 					</div>
 
 					{/* Toast Notification */}
-					{toast && (
-						<Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} duration={3000} />
-					)}
+					{toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} duration={3000} />}
 
 					{/* Student Info Card */}
 					{student && (

@@ -94,14 +94,13 @@ export default function Attendance() {
 	};
 
 	return (
-		<div className="flex h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+		<div className="flex h-screen bg-gray-50 dark:bg-page-dark">
 			<Sidebar />
 			<main className="flex-1 overflow-y-auto">
-				<div className="p-4 sm:p-8 lg:pl-8 pt-20 lg:pt-6 max-w-7xl mx-auto">
+				<div className="p-6 sm:p-8 lg:pl-12 pt-20 lg:pt-12 lg:pr-12 max-w-7xl mx-auto">
 					{/* Header */}
-					<div className="mb-6 sm:mb-10">
-						<h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2 sm:mb-3">출석 관리</h1>
-						<p className="text-sm sm:text-base lg:text-lg text-gray-600">반을 선택하여 출석을 관리하세요</p>
+					<div className="mb-6">
+						<h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">출석 관리</h1>
 					</div>
 
 					{/* Loading State */}

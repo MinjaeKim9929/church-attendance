@@ -150,32 +150,32 @@ export default function Sidebar() {
 			{/* Mobile Menu Button */}
 			<button
 				onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-				className="lg:hidden fixed top-4 left-4 z-50 p-2 mb-4 bg-white dark:bg-surface-dark rounded-lg shadow-md border border-gray-200 dark:border-border-dark hover:bg-gray-50 dark:hover:bg-surface-dark-hover transition-colors"
+				className="lg:hidden fixed top-4 left-4 z-50 p-2 mb-4 bg-white rounded-lg shadow-md border border-gray-200 hover:bg-gray-50 transition-colors"
 				aria-label="메뉴 토글"
 			>
 				{isMobileMenuOpen ? (
-					<X className="w-6 h-6 text-gray-700 dark:text-text-dark-primary" />
+					<X className="w-6 h-6 text-gray-700" />
 				) : (
-					<Menu className="w-6 h-6 text-gray-700 dark:text-text-dark-primary" />
+					<Menu className="w-6 h-6 text-gray-700" />
 				)}
 			</button>
 
 			{/* Backdrop with blur for mobile */}
 			{isMobileMenuOpen && (
 				<div
-					className="lg:hidden fixed inset-0 backdrop-blur-sm bg-white/30 dark:bg-black/30 z-30"
+					className="lg:hidden fixed inset-0 backdrop-blur-sm bg-white/30 z-30"
 					onClick={closeMobileMenu}
 				/>
 			)}
 
 			{/* Sidebar */}
 			<div
-				className={`fixed lg:static inset-y-0 left-0 z-40 flex flex-col h-screen w-64 bg-white dark:bg-surface-dark border-r border-gray-200 dark:border-border-dark transform transition-transform duration-300 ease-in-out ${
+				className={`fixed lg:static inset-y-0 left-0 z-40 flex flex-col h-screen w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out ${
 					isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
 				}`}
 			>
 				{/* Header */}
-				<div className="flex items-center gap-3 p-6 pt-24 lg:pt-6 border-b border-gray-200 dark:border-border-dark">
+				<div className="flex items-center gap-3 p-6 pt-24 lg:pt-6 border-b border-gray-200">
 					<div className="flex items-center justify-center w-10 h-10 bg-primary-500 rounded-lg">
 						<svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path
@@ -187,25 +187,25 @@ export default function Sidebar() {
 						</svg>
 					</div>
 					<div>
-						<h1 className="text-lg font-semibold text-gray-900 dark:text-text-dark-primary">런던 성 김대건 성당</h1>
-						<p className="text-xs text-gray-500 dark:text-text-dark-secondary">주일학교 2025-26</p>
+						<h1 className="text-lg font-semibold text-gray-900">런던 성 김대건 성당</h1>
+						<p className="text-xs text-gray-500">주일학교 2025-26</p>
 					</div>
 				</div>
 
 				{/* User Info */}
 				{user && (
-					<div className="p-4 border-b border-gray-200 dark:border-border-dark">
+					<div className="p-4 border-b border-gray-200">
 						<div className="flex items-center gap-3">
-							<div className="flex items-center justify-center w-10 h-10 bg-primary-100 dark:bg-primary-800 rounded-full">
-								<span className="text-sm font-medium text-primary-600 dark:text-primary-200">
+							<div className="flex items-center justify-center w-10 h-10 bg-primary-100 rounded-full">
+								<span className="text-sm font-medium text-primary-600">
 									{user.fullName?.charAt(0).toUpperCase()}
 								</span>
 							</div>
 							<div className="flex-1 min-w-0">
-								<p className="text-sm font-medium text-gray-900 dark:text-text-dark-primary truncate">
+								<p className="text-sm font-medium text-gray-900 truncate">
 									{user.fullName}
 								</p>
-								<p className="text-xs text-gray-500 dark:text-text-dark-secondary truncate">{user.email}</p>
+								<p className="text-xs text-gray-500 truncate">{user.email}</p>
 							</div>
 						</div>
 					</div>
@@ -224,8 +224,8 @@ export default function Sidebar() {
 								onClick={closeMobileMenu}
 								className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
 									active
-										? 'bg-primary-50 dark:bg-primary-900 text-primary-600 dark:text-primary-300'
-										: 'text-gray-700 dark:text-text-dark-secondary hover:bg-gray-50 dark:hover:bg-surface-dark-hover hover:text-gray-900 dark:hover:text-text-dark-primary'
+										? 'bg-primary-50 text-primary-600'
+										: 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
 								}`}
 							>
 								<Icon className="w-5 h-5" />
@@ -237,7 +237,7 @@ export default function Sidebar() {
 
 				{/* Preferences */}
 				{preferences && (
-					<div className="px-4 py-3 border-t border-gray-200 dark:border-border-dark">
+					<div className="px-4 py-3 border-t border-gray-200">
 						<div className="flex items-center justify-between gap-3">
 							{/* Theme Selector */}
 							<div className="flex items-center gap-1.5">
@@ -246,7 +246,7 @@ export default function Sidebar() {
 									className={`flex items-center justify-center p-1.5 rounded transition-all hover:cursor-pointer ${
 										preferences.theme === 'light'
 											? 'bg-primary-500 text-white'
-											: 'bg-gray-100 dark:bg-surface-dark-hover text-gray-600 dark:text-text-dark-secondary hover:bg-gray-200 dark:hover:bg-surface-dark-active'
+											: 'bg-gray-100 text-gray-600 hover:bg-gray-200'
 									}`}
 									title="라이트 모드 (Light Mode)"
 								>
@@ -257,7 +257,7 @@ export default function Sidebar() {
 									className={`flex items-center justify-center p-1.5 rounded transition-all hover:cursor-pointer ${
 										preferences.theme === 'dark'
 											? 'bg-primary-500 text-white'
-											: 'bg-gray-100 dark:bg-surface-dark-hover text-gray-600 dark:text-text-dark-secondary hover:bg-gray-200 dark:hover:bg-surface-dark-active'
+											: 'bg-gray-100 text-gray-600 hover:bg-gray-200'
 									}`}
 									title="다크 모드 (Dark Mode)"
 								>
@@ -268,7 +268,7 @@ export default function Sidebar() {
 									className={`flex items-center justify-center p-1.5 rounded transition-all hover:cursor-pointer ${
 										preferences.theme === 'auto'
 											? 'bg-primary-500 text-white'
-											: 'bg-gray-100 dark:bg-surface-dark-hover text-gray-600 dark:text-text-dark-secondary hover:bg-gray-200 dark:hover:bg-surface-dark-active'
+											: 'bg-gray-100 text-gray-600 hover:bg-gray-200'
 									}`}
 									title="자동 (시스템 설정에 따름)"
 								>
@@ -277,7 +277,7 @@ export default function Sidebar() {
 							</div>
 
 							{/* Divider */}
-							<div className="h-6 w-px bg-gray-300 dark:bg-border-dark"></div>
+							<div className="h-6 w-px bg-gray-300"></div>
 
 							{/* Language Selector */}
 							<div className="flex items-center gap-1.5">
@@ -286,7 +286,7 @@ export default function Sidebar() {
 									className={`px-2 py-1 rounded text-xs font-medium transition-all hover:cursor-pointer ${
 										preferences.language === 'ko'
 											? 'bg-primary-500 text-white'
-											: 'bg-gray-100 dark:bg-surface-dark-hover text-gray-600 dark:text-text-dark-secondary hover:bg-gray-200 dark:hover:bg-surface-dark-active'
+											: 'bg-gray-100 text-gray-600 hover:bg-gray-200'
 									}`}
 									title="한국어 (Korean)"
 								>
@@ -297,7 +297,7 @@ export default function Sidebar() {
 									className={`px-2 py-1 rounded text-xs font-medium transition-all hover:cursor-pointer ${
 										preferences.language === 'en'
 											? 'bg-primary-500 text-white'
-											: 'bg-gray-100 dark:bg-surface-dark-hover text-gray-600 dark:text-text-dark-secondary hover:bg-gray-200 dark:hover:bg-surface-dark-active'
+											: 'bg-gray-100 text-gray-600 hover:bg-gray-200'
 									}`}
 									title="영어 (English)"
 								>
@@ -309,13 +309,13 @@ export default function Sidebar() {
 				)}
 
 				{/* Logout Button */}
-				<div className="p-4 border-t border-gray-200 dark:border-border-dark">
+				<div className="p-4 border-t border-gray-200">
 					<button
 						onClick={() => {
 							handleLogout();
 							closeMobileMenu();
 						}}
-						className="flex items-center gap-3 w-full px-4 py-3 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:cursor-pointer rounded-lg transition-colors"
+						className="flex items-center gap-3 w-full px-4 py-3 text-red-600 hover:bg-red-50 hover:cursor-pointer rounded-lg transition-colors"
 					>
 						<LogOut className="w-5 h-5" />
 						<span className="font-medium text-sm">로그아웃</span>

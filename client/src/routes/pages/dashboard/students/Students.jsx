@@ -194,14 +194,14 @@ export default function Students() {
 	};
 
 	return (
-		<div className="flex h-screen bg-gray-50">
+		<div className="flex h-screen bg-gray-50 dark:bg-page-dark">
 			<Sidebar />
 			<main className="flex-1 overflow-y-auto">
-				<div className="p-6 sm:p-8 lg:pl-8 pt-20 lg:pt-6">
+				<div className="p-6 sm:p-8 lg:pl-12 pt-20 lg:pt-12 lg:pr-12 max-w-7xl mx-auto">
 					{/* Header */}
 					<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
 						<div>
-							<h1 className="text-2xl sm:text-3xl font-bold text-gray-900">학생 관리</h1>
+							<h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 ">학생 관리</h1>
 						</div>
 						<button
 							onClick={() => setIsModalOpen(true)}
@@ -227,9 +227,7 @@ export default function Students() {
 					</div>
 
 					{/* Toast Notification */}
-					{toast && (
-						<Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} duration={3000} />
-					)}
+					{toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} duration={3000} />}
 
 					{/* Loading State */}
 					{isLoading ? (
@@ -366,7 +364,7 @@ export default function Students() {
 															<td className="px-6 py-3.5 whitespace-nowrap">
 																<div className="text-sm text-gray-700">{student.gender}</div>
 															</td>
-														<td className="px-6 py-3.5 whitespace-nowrap">
+															<td className="px-6 py-3.5 whitespace-nowrap">
 																<div className="flex items-center justify-center gap-2">
 																	<button
 																		onClick={(e) => handleEditClick(e, student)}
@@ -415,7 +413,7 @@ export default function Students() {
 														{student.grade}
 													</span>
 												</div>
-													<div className="flex items-center justify-between text-sm text-gray-600 ml-8">
+												<div className="flex items-center justify-between text-sm text-gray-600 ml-8">
 													<div className="flex items-center gap-4">
 														<div className="flex items-center gap-1">
 															<span className="font-medium">성별:</span>
