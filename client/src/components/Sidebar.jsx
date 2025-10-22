@@ -3,11 +3,13 @@ import { Link, useLocation } from 'react-router';
 import { Home, Users, Calendar, Settings, LogOut, Menu, X, Sun, Moon, Monitor } from 'lucide-react';
 import { useAuth } from '../context/useAuth';
 import axios from 'axios';
+import ConfirmModal from './ConfirmModal';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
 export default function Sidebar() {
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+	const [showLogoutModal, setShowLogoutModal] = useState(false);
 	const location = useLocation();
 	const { user, logout } = useAuth();
 	const [preferences, setPreferences] = useState(null);
@@ -311,10 +313,7 @@ export default function Sidebar() {
 				{/* Logout Button */}
 				<div className="p-4 border-t border-gray-200">
 					<button
-						onClick={() => {
-							handleLogout();
-							closeMobileMenu();
-						}}
+						onClick={() => setShowLogoutModal(true)}
 						className="flex items-center gap-3 w-full px-4 py-3 text-red-600 hover:bg-red-50 hover:cursor-pointer rounded-lg transition-colors"
 					>
 						<LogOut className="w-5 h-5" />
@@ -322,6 +321,20 @@ export default function Sidebar() {
 					</button>
 				</div>
 			</div>
+
+			{/* Logout Confirmation Modal */}
+			<ConfirmModal
+				isOpen={showLogoutModal}
+				onClose={() => setShowLogoutModal(false)}
+				onConfirm={() => {
+					handleLogout();
+					closeMobileMenu();
+				}}
+				title="로그아웃"
+				message="정말 로그아웃 하시겠습니까?"
+				confirmText="로그아웃"
+				cancelText="취소"
+			/>
 		</>
 	);
 }

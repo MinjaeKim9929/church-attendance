@@ -64,6 +64,7 @@ export default function Settings() {
 		return () => {
 			window.removeEventListener('preferencesUpdated', handlePreferencesUpdate);
 		};
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	useEffect(() => {
