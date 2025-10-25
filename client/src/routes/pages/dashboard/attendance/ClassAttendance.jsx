@@ -20,10 +20,11 @@ export default function ClassAttendance() {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const classInfo = location.state?.classInfo;
+	const initialDate = location.state?.selectedDate || getLocalDateString();
 
 	const [students, setStudents] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
-	const [selectedDate, setSelectedDate] = useState(getLocalDateString());
+	const [selectedDate, setSelectedDate] = useState(initialDate);
 	const [attendance, setAttendance] = useState({});
 	const [isSaving, setIsSaving] = useState(false);
 	const [toast, setToast] = useState(null);

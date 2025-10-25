@@ -21,10 +21,6 @@ const userSchema = new mongoose.Schema(
 			enum: ['admin', 'teacher'],
 			default: 'teacher',
 		},
-		assignedClassIndex: {
-			type: Number,
-			default: null, // null means no class assigned (admin), or index of class in ClassConfiguration.classes array
-		},
 		phone: {
 			type: String,
 			default: '',

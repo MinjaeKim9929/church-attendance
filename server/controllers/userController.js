@@ -146,7 +146,6 @@ const getSettings = async (req, res) => {
 			fullName: user.fullName,
 			email: user.email,
 			role: user.role,
-			assignedClassIndex: user.assignedClassIndex,
 			phone: user.phone,
 			preferences: user.preferences,
 			isActive: user.isActive,
@@ -164,7 +163,7 @@ const getSettings = async (req, res) => {
 // @access  Protected
 const updateSettings = async (req, res) => {
 	try {
-		const { fullName, phone, preferences, assignedClassIndex } = req.body;
+		const { fullName, phone, preferences } = req.body;
 
 		const user = await User.findById(req.user._id);
 
@@ -175,7 +174,6 @@ const updateSettings = async (req, res) => {
 		// Update fields if provided
 		if (fullName !== undefined) user.fullName = fullName;
 		if (phone !== undefined) user.phone = phone;
-		if (assignedClassIndex !== undefined) user.assignedClassIndex = assignedClassIndex;
 
 		// Update preferences
 		if (preferences) {
@@ -190,7 +188,6 @@ const updateSettings = async (req, res) => {
 			fullName: updatedUser.fullName,
 			email: updatedUser.email,
 			role: updatedUser.role,
-			assignedClassIndex: updatedUser.assignedClassIndex,
 			phone: updatedUser.phone,
 			preferences: updatedUser.preferences,
 			isActive: updatedUser.isActive,
