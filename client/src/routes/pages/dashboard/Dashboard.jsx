@@ -548,7 +548,6 @@ export default function Dashboard() {
 																			weekday: 'short',
 																		})}
 																	</p>
-																	<p className="text-xs text-gray-500">{day.records.length}명 기록</p>
 																</div>
 																<div className="text-right">
 																	<p className="text-sm font-bold text-gray-900">{presentCount}명</p>
