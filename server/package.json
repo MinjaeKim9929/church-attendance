@@ -22,9 +22,11 @@
     "express": "^5.1.0",
     "express-validator": "^7.2.1",
     "gravatar": "^1.8.2",
+    "http": "^0.0.1-security",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.19.0",
-    "request": "^2.88.2"
+    "request": "^2.88.2",
+    "socket.io": "^4.8.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
