@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router';
 import axios from 'axios';
 import { ArrowLeft, Calendar, Check, X, Save, Users as UsersIcon } from 'lucide-react';
-import Sidebar from '../../../../components/Sidebar';
 import Toast from '../../../../components/Toast';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
@@ -51,10 +50,13 @@ export default function ClassAttendance() {
 			// Filter students by class configuration
 			let filteredStudents = response.data;
 			if (classInfo) {
-				if (classInfo.selectionMode === 'students' && classInfo.students) {
+				if (classInfo.selectionMode === 'all' || classInfo.id === 'all') {
+				// For "All" option, show all students
+				filteredStudents = response.data;
+			} else if (classInfo.selectionMode === 'students' && classInfo.students && classInfo.students.length > 0) {
 					// Filter by specific student IDs
 					filteredStudents = response.data.filter((student) => classInfo.students.includes(student._id));
-				} else if (classInfo.grades) {
+				} else if (classInfo.grades && classInfo.grades.length > 0) {
 					// Filter by grades
 					filteredStudents = response.data.filter((student) => classInfo.grades.includes(student.grade));
 				}
@@ -99,7 +101,13 @@ export default function ClassAttendance() {
 			// Create a map of existing attendance by studentId, filtered by current class
 			const attendanceMap = {};
 			response.data.attendanceRecords
-				.filter((record) => record.class === classInfo.name) // Filter by current class
+				.filter((record) => {
+				// For "All" option, include all records; otherwise filter by current class
+				if (classInfo.selectionMode === 'all' || classInfo.id === 'all') {
+					return true;
+				}
+				return record.class === classInfo.name;
+			})
 				.forEach((record) => {
 					attendanceMap[record.studentId._id] = record.status === 'Present';
 				});
@@ -189,11 +197,9 @@ export default function ClassAttendance() {
 	const absentCount = Object.values(attendance).filter((status) => status === false).length;
 
 	return (
-		<div className="flex h-screen bg-gray-50 dark:bg-page-dark">
-			<Sidebar />
-			<main className="flex-1 overflow-y-auto">
-				<div className="p-6 sm:p-8 lg:pl-12 pt-20 lg:pt-12 lg:pr-12 max-w-7xl mx-auto">
-					{/* Header */}
+		<>
+			<div className="max-w-7xl mx-auto">
+				{/* Header */}
 					<div className="mb-6">
 						<button
 							onClick={() => navigate('/dashboard/attendance')}
@@ -421,8 +427,10 @@ export default function ClassAttendance() {
 							)}
 						</>
 					)}
-				</div>
-			</main>
+
+			{/* Toast Notification */}
+			{toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} duration={3000} />}
 		</div>
+		</>
 	);
 }

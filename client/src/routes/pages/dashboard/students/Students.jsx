@@ -4,7 +4,6 @@ import axios from 'axios';
 import { Plus, Search, ArrowUpDown, Edit2, Trash2 } from 'lucide-react';
 import AddStudentModal from '../../../../components/AddStudentModal';
 import DeleteConfirmModal from '../../../../components/DeleteConfirmModal';
-import Sidebar from '../../../../components/Sidebar';
 import Toast from '../../../../components/Toast';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
@@ -194,11 +193,9 @@ export default function Students() {
 	};
 
 	return (
-		<div className="flex h-screen bg-gray-50 dark:bg-page-dark">
-			<Sidebar />
-			<main className="flex-1 overflow-y-auto">
-				<div className="p-6 sm:p-8 lg:pl-12 pt-20 lg:pt-12 lg:pr-12 max-w-7xl mx-auto">
-					{/* Header */}
+		<>
+			<div className="max-w-7xl mx-auto">
+				{/* Header */}
 					<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
 						<div>
 							<h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 ">학생 관리</h1>
@@ -450,8 +447,7 @@ export default function Students() {
 							)}
 						</>
 					)}
-				</div>
-			</main>
+			</div>
 
 			{/* Add Student Modal */}
 			{isModalOpen && <AddStudentModal onClose={() => setIsModalOpen(false)} onSubmit={handleAddStudent} />}
@@ -470,6 +466,6 @@ export default function Students() {
 				message={`${deletingStudent?.fullName} 학생을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`}
 				isDeleting={isDeleting}
 			/>
-		</div>
+		</>
 	);
 }

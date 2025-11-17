@@ -1,5 +1,6 @@
 import { createBrowserRouter, RouterProvider } from 'react-router';
 import ProtectedLayout from './pages/layouts/ProtectedLayout';
+import DashboardLayout from './pages/layouts/DashboardLayout';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -29,27 +30,33 @@ const router = createBrowserRouter([
 		children: [
 			{
 				path: '/dashboard',
-				element: <Dashboard />,
-			},
-			{
-				path: '/dashboard/students',
-				element: <Students />,
-			},
-			{
-				path: '/dashboard/students/:id',
-				element: <StudentDetail />,
-			},
-			{
-				path: '/dashboard/attendance',
-				element: <Attendance />,
-			},
-			{
-				path: '/dashboard/attendance/:id',
-				element: <ClassAttendance />,
-			},
-			{
-				path: '/dashboard/settings',
-				element: <Settings />,
+				element: <DashboardLayout />,
+				children: [
+					{
+						index: true,
+						element: <Dashboard />,
+					},
+					{
+						path: 'students',
+						element: <Students />,
+					},
+					{
+						path: 'students/:id',
+						element: <StudentDetail />,
+					},
+					{
+						path: 'attendance',
+						element: <Attendance />,
+					},
+					{
+						path: 'attendance/:id',
+						element: <ClassAttendance />,
+					},
+					{
+						path: 'settings',
+						element: <Settings />,
+					},
+				],
 			},
 		],
 	},

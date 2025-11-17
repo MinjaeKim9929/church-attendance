@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import Sidebar from '../../../../components/Sidebar';
 import ClassCard from '../../../../components/ClassCard';
 import { Users, Loader2, AlertCircle } from 'lucide-react';
 
@@ -97,11 +96,9 @@ export default function Attendance() {
 	};
 
 	return (
-		<div className="flex h-screen bg-gray-50 dark:bg-page-dark">
-			<Sidebar />
-			<main className="flex-1 overflow-y-auto">
-				<div className="p-6 sm:p-8 lg:pl-12 pt-20 lg:pt-12 lg:pr-12 max-w-7xl mx-auto">
-					{/* Header */}
+		<>
+			<div className="max-w-7xl mx-auto">
+				{/* Header */}
 					<div className="mb-6">
 						<h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">출석 관리</h1>
 					</div>
@@ -154,8 +151,7 @@ export default function Attendance() {
 							))}
 						</div>
 					)}
-				</div>
-			</main>
-		</div>
+			</div>
+		</>
 	);
 }

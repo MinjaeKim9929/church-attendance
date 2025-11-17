@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import axios from 'axios';
 import { ArrowLeft, Edit2, Trash2, Calendar, ChevronLeft, ChevronRight, CheckCircle, XCircle, Filter } from 'lucide-react';
-import Sidebar from '../../../../components/Sidebar';
 import DeleteConfirmModal from '../../../../components/DeleteConfirmModal';
 import AddStudentModal from '../../../../components/AddStudentModal';
 import Toast from '../../../../components/Toast';
@@ -266,11 +265,9 @@ export default function StudentDetail() {
 	}
 
 	return (
-		<div className="flex h-screen bg-gray-50 dark:bg-page-dark">
-			<Sidebar />
-			<main className="flex-1 overflow-y-auto">
-				<div className="p-6 sm:p-8 lg:pl-12 lg:pr-12 pt-20 lg:pt-12 max-w-7xl mx-auto">
-					{/* Back Button */}
+		<>
+			<div className="max-w-7xl mx-auto">
+				{/* Back Button */}
 					<div className="mb-6">
 						<button
 							onClick={() => navigate('/dashboard/students')}
@@ -746,8 +743,7 @@ export default function StudentDetail() {
 							</div>
 						</div>
 					)}
-				</div>
-			</main>
+			</div>
 
 			{/* Edit Student Modal */}
 			{editModal && student && (
@@ -763,6 +759,6 @@ export default function StudentDetail() {
 				message={`${student?.fullName} 학생을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`}
 				isDeleting={isDeleting}
 			/>
-		</div>
+		</>
 	);
 }
