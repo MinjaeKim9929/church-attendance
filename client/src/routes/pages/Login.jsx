@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { EyeClosed, Eye } from 'lucide-react';
 import { useAuth } from '../../context/useAuth';
 import { useNavigate } from 'react-router';
-import Toast from '../../components/Toast';
+import Toast from '../../components/ui/feedback/Toast';
 
 export default function Login() {
 	const { user, login, isLoading: authLoading, error: authError, clearError } = useAuth();

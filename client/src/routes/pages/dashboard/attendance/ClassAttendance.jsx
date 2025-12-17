@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router';
 import axios from 'axios';
 import { ArrowLeft, Calendar, Check, X, Save, Users as UsersIcon } from 'lucide-react';
-import Toast from '../../../../components/Toast';
+import Toast from '../../../../components/ui/feedback/Toast';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 

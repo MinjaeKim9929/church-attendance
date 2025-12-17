@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import axios from 'axios';
 import { Plus, Search, ArrowUpDown, Edit2, Trash2 } from 'lucide-react';
-import AddStudentModal from '../../../../components/AddStudentModal';
-import DeleteConfirmModal from '../../../../components/DeleteConfirmModal';
-import Toast from '../../../../components/Toast';
+import AddStudentModal from '../../../../components/features/students/AddStudentModal';
+import DeleteConfirmModal from '../../../../components/ui/modals/DeleteConfirmModal';
+import Toast from '../../../../components/ui/feedback/Toast';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 

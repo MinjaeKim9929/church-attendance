@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router';
 import { Home, Users, Calendar, Settings, LogOut, Menu, X, Sun, Moon, Monitor } from 'lucide-react';
-import { useAuth } from '../context/useAuth';
+import { useAuth } from '../../context/useAuth';
 import axios from 'axios';
-import ConfirmModal from './ConfirmModal';
+import ConfirmModal from '../ui/modals/ConfirmModal';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 

@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import ClassCard from '../../../../components/ClassCard';
+import ClassCard from '../../../../components/ui/cards/ClassCard';
 import { Users, Loader2, AlertCircle } from 'lucide-react';
 
 // Color palette for class cards

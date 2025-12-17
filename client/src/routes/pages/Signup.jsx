@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { useAuth } from '../../context/useAuth';
-import Toast from '../../components/Toast';
+import Toast from '../../components/ui/feedback/Toast';
 
 export default function SignUpPage() {
 	const { user, signup, isLoading: authLoading, error: authError, clearError } = useAuth();
