@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router';
-import { Home, Users, Calendar, Settings, LogOut, Menu, X, Sun, Moon, Monitor } from 'lucide-react';
+import { Home, Users, Calendar, Settings, LogOut, Menu, X, Sun, Moon, Monitor, ChartColumn } from 'lucide-react';
 import { useAuth } from '../../context/useAuth';
 import axios from 'axios';
 import ConfirmModal from '../ui/modals/ConfirmModal';
@@ -97,7 +97,7 @@ export default function Sidebar() {
 			window.dispatchEvent(
 				new CustomEvent('preferencesUpdated', {
 					detail: updatedPreferences,
-				})
+				}),
 			);
 
 			await axios.put(
@@ -107,7 +107,7 @@ export default function Sidebar() {
 				},
 				{
 					withCredentials: true,
-				}
+				},
 			);
 		} catch (error) {
 			console.error('Failed to update preference:', error);
@@ -133,6 +133,11 @@ export default function Sidebar() {
 			icon: Calendar,
 		},
 		{
+			name: '출석 통계',
+			path: '/dashboard/stats',
+			icon: ChartColumn,
+		},
+		{
 			name: '설정',
 			path: '/dashboard/settings',
 			icon: Settings,
@@ -155,19 +160,12 @@ export default function Sidebar() {
 				className="lg:hidden fixed top-4 left-4 z-50 p-2 mb-4 bg-white rounded-lg shadow-md border border-gray-200 hover:bg-gray-50 transition-colors"
 				aria-label="메뉴 토글"
 			>
-				{isMobileMenuOpen ? (
-					<X className="w-6 h-6 text-gray-700" />
-				) : (
-					<Menu className="w-6 h-6 text-gray-700" />
-				)}
+				{isMobileMenuOpen ? <X className="w-6 h-6 text-gray-700" /> : <Menu className="w-6 h-6 text-gray-700" />}
 			</button>
 
 			{/* Backdrop with blur for mobile */}
 			{isMobileMenuOpen && (
-				<div
-					className="lg:hidden fixed inset-0 backdrop-blur-sm bg-white/30 z-30"
-					onClick={closeMobileMenu}
-				/>
+				<div className="lg:hidden fixed inset-0 backdrop-blur-sm bg-white/30 z-30" onClick={closeMobileMenu} />
 			)}
 
 			{/* Sidebar */}
@@ -199,14 +197,10 @@ export default function Sidebar() {
 					<div className="p-4 border-b border-gray-200">
 						<div className="flex items-center gap-3">
 							<div className="flex items-center justify-center w-10 h-10 bg-primary-100 rounded-full">
-								<span className="text-sm font-medium text-primary-600">
-									{user.fullName?.charAt(0).toUpperCase()}
-								</span>
+								<span className="text-sm font-medium text-primary-600">{user.fullName?.charAt(0).toUpperCase()}</span>
 							</div>
 							<div className="flex-1 min-w-0">
-								<p className="text-sm font-medium text-gray-900 truncate">
-									{user.fullName}
-								</p>
+								<p className="text-sm font-medium text-gray-900 truncate">{user.fullName}</p>
 								<p className="text-xs text-gray-500 truncate">{user.email}</p>
 							</div>
 						</div>
@@ -225,9 +219,7 @@ export default function Sidebar() {
 								to={item.path}
 								onClick={closeMobileMenu}
 								className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-									active
-										? 'bg-primary-50 text-primary-600'
-										: 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+									active ? 'bg-primary-50 text-primary-600' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
 								}`}
 							>
 								<Icon className="w-5 h-5" />

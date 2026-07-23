@@ -10,6 +10,7 @@ import StudentDetail from './pages/dashboard/students/StudentDetail';
 import Attendance from './pages/dashboard/attendance/Attendance';
 import ClassAttendance from './pages/dashboard/attendance/ClassAttendance';
 import Settings from './pages/dashboard/settings/Settings';
+import Stats from './pages/dashboard/stats/AttendanceStats';
 import Chat from './pages/dashboard/chat/Chat';
 import NotFound from './pages/NotFound';
 
@@ -60,6 +61,10 @@ const router = createBrowserRouter([
 					{
 						path: 'chat',
 						element: <Chat />,
+					},
+					{
+						path: 'stats',
+						element: <Stats />,
 					},
 				],
 			},

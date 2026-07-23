@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useBlocker } from 'react-router';
 import axios from 'axios';
-import { Save, Plus, Trash2, AlertTriangle } from 'lucide-react';
+import { Save, Plus, Trash2, AlertTriangle, GripVertical } from 'lucide-react';
 import Toast from '../../../../components/ui/feedback/Toast';
 import { useAuth } from '../../../../context/useAuth';
 
@@ -33,6 +33,8 @@ export default function Settings() {
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 	const [showNavigationModal, setShowNavigationModal] = useState(false);
 	const [blockedNavigation, setBlockedNavigation] = useState(null);
+	const [dragIndex, setDragIndex] = useState(null);
+	const [dragOverIndex, setDragOverIndex] = useState(null);
 
 	// Block navigation if there are unsaved changes
 	const blocker = useBlocker(
@@ -259,6 +261,33 @@ export default function Settings() {
 		}
 
 		setClasses(updatedClasses);
+	};
+
+	const handleDragStart = (e, index) => {
+		setDragIndex(index);
+		e.dataTransfer.effectAllowed = 'move';
+	};
+
+	const handleDragOver = (e, index) => {
+		e.preventDefault();
+		e.dataTransfer.dropEffect = 'move';
+		setDragOverIndex(index);
+	};
+
+	const handleDrop = (e, index) => {
+		e.preventDefault();
+		if (dragIndex === null || dragIndex === index) return;
+		const updated = [...classes];
+		const [removed] = updated.splice(dragIndex, 1);
+		updated.splice(index, 0, removed);
+		setClasses(updated);
+		setDragIndex(null);
+		setDragOverIndex(null);
+	};
+
+	const handleDragEnd = () => {
+		setDragIndex(null);
+		setDragOverIndex(null);
 	};
 
 	const handleSave = async () => {
@@ -652,156 +681,168 @@ export default function Settings() {
 									)}
 								</div>
 							) : (
-								<div className="space-y-6">
-									{classes.map((classInfo, index) => (
-										<div key={index} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-											<div className="flex items-start justify-between mb-4">
-												<div className="flex-1">
-													<label className="block text-sm font-medium text-gray-700 mb-2">반 이름</label>
-													<input
-														type="text"
-														value={classInfo.className}
-														onChange={(e) => handleClassNameChange(index, e.target.value)}
-														placeholder="예: 유치부, 초등부, 고등부"
-														className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none bg-white"
-													/>
-												</div>
+							<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+								{classes.map((classInfo, index) => (
+									<div
+										key={index}
+										draggable={isAdmin}
+										onDragStart={(e) => handleDragStart(e, index)}
+										onDragOver={(e) => handleDragOver(e, index)}
+										onDrop={(e) => handleDrop(e, index)}
+										onDragEnd={handleDragEnd}
+										className={`rounded-lg p-3 bg-gray-50 transition-all border-2 ${
+											dragIndex === index
+												? 'opacity-40 border-gray-200'
+												: dragOverIndex === index
+												? 'border-primary-400'
+												: 'border-gray-200'
+										}`}
+									>
+										<div className="flex items-center justify-between mb-2.5">
+											<div className="flex items-center gap-1.5 flex-1 min-w-0">
+												{isAdmin && (
+													<GripVertical className="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing flex-shrink-0" />
+												)}
+												<input
+													type="text"
+													value={classInfo.className}
+													onChange={(e) => handleClassNameChange(index, e.target.value)}
+													placeholder="예: 유치부, 초등부"
+													className="flex-1 min-w-0 px-2.5 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none bg-white font-medium"
+												/>
+											</div>
+											<button
+												onClick={() => handleRemoveClass(index)}
+												className="ml-2 p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors hover:cursor-pointer flex-shrink-0"
+												title="삭제"
+											>
+												<Trash2 className="w-4 h-4" />
+											</button>
+										</div>
+
+										{/* Selection Mode Toggle */}
+										<div className="mb-2.5 flex items-center gap-2">
+											<span className="text-xs text-gray-500 flex-shrink-0">방식</span>
+											<div className="flex gap-1.5">
 												<button
-													onClick={() => handleRemoveClass(index)}
-													className="ml-4 p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors hover:cursor-pointer"
-													title="삭제"
+													type="button"
+													onClick={() => handleSelectionModeChange(index, 'grades')}
+													disabled={!isAdmin}
+													className={`px-2.5 py-1 rounded-md font-medium text-xs transition-all border hover:cursor-pointer ${
+														classInfo.selectionMode === 'grades'
+															? 'bg-primary-500 text-white border-primary-500'
+															: 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+													} ${!isAdmin ? 'opacity-60 cursor-not-allowed' : ''}`}
 												>
-													<Trash2 className="w-5 h-5" />
+													학년별
+												</button>
+												<button
+													type="button"
+													onClick={() => handleSelectionModeChange(index, 'students')}
+													disabled={!isAdmin}
+													className={`px-2.5 py-1 rounded-md font-medium text-xs transition-all border hover:cursor-pointer ${
+														classInfo.selectionMode === 'students'
+															? 'bg-primary-500 text-white border-primary-500'
+															: 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+													} ${!isAdmin ? 'opacity-60 cursor-not-allowed' : ''}`}
+												>
+													학생별
 												</button>
 											</div>
+										</div>
 
-											{/* Selection Mode Toggle */}
-											<div className="mb-4">
-												<label className="block text-sm font-medium text-gray-700 mb-2">선택 방식</label>
-												<div className="flex gap-3">
-													<button
-														type="button"
-														onClick={() => handleSelectionModeChange(index, 'grades')}
-														disabled={!isAdmin}
-														className={`px-4 py-2 rounded-lg font-medium text-sm transition-all border-2 hover:cursor-pointer ${
-															classInfo.selectionMode === 'grades'
-																? 'bg-primary-500 text-white border-primary-500 shadow-md'
-																: 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-														} ${!isAdmin ? 'opacity-60 cursor-not-allowed' : ''}`}
-													>
-														학년별
-													</button>
-													<button
-														type="button"
-														onClick={() => handleSelectionModeChange(index, 'students')}
-														disabled={!isAdmin}
-														className={`px-4 py-2 rounded-lg font-medium text-sm transition-all border-2 hover:cursor-pointer ${
-															classInfo.selectionMode === 'students'
-																? 'bg-primary-500 text-white border-primary-500 shadow-md'
-																: 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-														} ${!isAdmin ? 'opacity-60 cursor-not-allowed' : ''}`}
-													>
-														학생별
-													</button>
+										{/* Grade Selection */}
+										{classInfo.selectionMode === 'grades' && (
+											<div>
+												<p className="text-xs text-gray-500 mb-1.5">학년 선택</p>
+												<div className="flex flex-wrap gap-1">
+													{AVAILABLE_GRADES.map((grade) => (
+														<button
+															key={grade}
+															onClick={() => handleGradeToggle(index, grade)}
+															disabled={!isAdmin}
+															className={`px-2 py-1 rounded-md font-medium text-xs transition-all hover:cursor-pointer ${
+																classInfo.grades.includes(grade)
+																	? 'bg-primary-500 text-white hover:bg-primary-600'
+																	: 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+															} ${!isAdmin ? 'opacity-60 cursor-not-allowed' : ''}`}
+														>
+															{grade}
+														</button>
+													))}
 												</div>
 											</div>
+										)}
 
-											{/* Grade Selection */}
-											{classInfo.selectionMode === 'grades' && (
-												<div>
-													<label className="block text-sm font-medium text-gray-700 mb-2">학년 선택</label>
-													<div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
-														{AVAILABLE_GRADES.map((grade) => (
+										{/* Student Selection */}
+										{classInfo.selectionMode === 'students' && (
+											<div>
+												<p className="text-xs text-gray-500 mb-1.5">학생 선택 ({classInfo.students?.length || 0}명)</p>
+												{allStudents.length === 0 ? (
+													<p className="text-xs text-gray-500">등록된 학생이 없습니다.</p>
+												) : (
+													<div className="grid grid-cols-2 gap-1 max-h-40 overflow-y-auto p-1.5 bg-white rounded-lg border border-gray-200">
+														{allStudents.map((student) => (
 															<button
-																key={grade}
-																onClick={() => handleGradeToggle(index, grade)}
+																key={student._id}
+																type="button"
+																onClick={() => handleStudentToggle(index, student._id)}
 																disabled={!isAdmin}
-																className={`px-3 py-2 rounded-lg font-medium text-sm transition-all hover:cursor-pointer ${
-																	classInfo.grades.includes(grade)
-																		? 'bg-primary-500 text-white shadow-md hover:bg-primary-600'
+																className={`px-2 py-1 rounded-md font-medium text-xs transition-all hover:cursor-pointer text-left ${
+																	classInfo.students?.includes(student._id)
+																		? 'bg-primary-500 text-white hover:bg-primary-600'
 																		: 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
 																} ${!isAdmin ? 'opacity-60 cursor-not-allowed' : ''}`}
 															>
-																{grade}
+																<div className="flex items-center justify-between gap-1">
+																	<span className="truncate">{student.fullName}</span>
+																	<span className="opacity-75 flex-shrink-0">
+																		{student.grade === 'JK' || student.grade === 'SK'
+																			? student.grade
+																			: `${student.grade}학년`}
+																	</span>
+																</div>
 															</button>
 														))}
 													</div>
-												</div>
-											)}
+												)}
+											</div>
+										)}
 
-											{/* Student Selection */}
-											{classInfo.selectionMode === 'students' && (
-												<div>
-													<label className="block text-sm font-medium text-gray-700 mb-2">
-														학생 선택 ({classInfo.students?.length || 0}명 선택됨)
-													</label>
-													{allStudents.length === 0 ? (
-														<p className="text-sm text-gray-500">등록된 학생이 없습니다. 먼저 학생을 추가해주세요.</p>
-													) : (
-														<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-64 overflow-y-auto p-2 bg-white rounded-lg border border-gray-200">
-															{allStudents.map((student) => (
-																<button
-																	key={student._id}
-																	type="button"
-																	onClick={() => handleStudentToggle(index, student._id)}
-																	disabled={!isAdmin}
-																	className={`px-3 py-2 rounded-lg font-medium text-sm transition-all hover:cursor-pointer text-left ${
-																		classInfo.students?.includes(student._id)
-																			? 'bg-primary-500 text-white shadow-md hover:bg-primary-600'
-																			: 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-																	} ${!isAdmin ? 'opacity-60 cursor-not-allowed' : ''}`}
-																>
-																	<div className="flex items-center justify-between">
-																		<span>{student.fullName}</span>
-																		<span className="text-xs opacity-75">
-																			{student.grade === 'JK' || student.grade === 'SK'
-																				? student.grade
-																				: `${student.grade}학년`}
-																		</span>
-																	</div>
-																</button>
-															))}
-														</div>
-													)}
-												</div>
-											)}
-
-											{/* Teacher Assignment (Admin Only) */}
-											{isAdmin && (
-												<div className="mt-4">
-													<label className="block text-sm font-medium text-gray-700 mb-2">
-														담당 교사 ({classInfo.teachers?.length || 0}명 선택됨)
-													</label>
-													{allUsers.length === 0 ? (
-														<p className="text-sm text-gray-500">등록된 사용자가 없습니다.</p>
-													) : (
-														<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-64 overflow-y-auto p-2 bg-white rounded-lg border border-gray-200">
-															{allUsers.map((userItem) => (
-																<button
-																	key={userItem._id}
-																	type="button"
-																	onClick={() => handleTeacherToggle(index, userItem._id)}
-																	className={`px-3 py-2 rounded-lg font-medium text-sm transition-all hover:cursor-pointer text-left ${
-																		classInfo.teachers?.includes(userItem._id)
-																			? 'bg-primary-500 text-white shadow-md hover:bg-primary-600'
-																			: 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-																	}`}
-																>
-																	<div className="flex items-center justify-between">
-																		<span>{userItem.fullName}</span>
-																		<span className="text-xs opacity-75">
-																			{userItem.role === 'admin' ? '관리자' : '교사'}
-																		</span>
-																	</div>
-																</button>
-															))}
-														</div>
-													)}
-												</div>
-											)}
-										</div>
-									))}
-								</div>
+										{/* Teacher Assignment (Admin Only) */}
+										{isAdmin && (
+											<div className="mt-2.5">
+												<p className="text-xs text-gray-500 mb-1.5">담당 교사 ({classInfo.teachers?.length || 0}명)</p>
+												{allUsers.length === 0 ? (
+													<p className="text-xs text-gray-500">등록된 사용자가 없습니다.</p>
+												) : (
+													<div className="grid grid-cols-2 gap-1 max-h-28 overflow-y-auto p-1.5 bg-white rounded-lg border border-gray-200">
+														{allUsers.map((userItem) => (
+															<button
+																key={userItem._id}
+																type="button"
+																onClick={() => handleTeacherToggle(index, userItem._id)}
+																className={`px-2 py-1 rounded-md font-medium text-xs transition-all hover:cursor-pointer text-left ${
+																	classInfo.teachers?.includes(userItem._id)
+																		? 'bg-primary-500 text-white hover:bg-primary-600'
+																		: 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+																}`}
+															>
+																<div className="flex items-center justify-between gap-1">
+																	<span className="truncate">{userItem.fullName}</span>
+																	<span className="text-xs opacity-75 flex-shrink-0">
+																		{userItem.role === 'admin' ? '관리자' : '교사'}
+																	</span>
+																</div>
+															</button>
+														))}
+													</div>
+												)}
+											</div>
+										)}
+									</div>
+								))}
+							</div>
 							)}
 						</div>
 					</div>

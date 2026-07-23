@@ -536,7 +536,7 @@ export default function StudentDetail() {
 															// Days of the month
 															for (let day = 1; day <= daysInMonth; day++) {
 																const dateStr = `${currentMonth.getFullYear()}-${String(
-																	currentMonth.getMonth() + 1
+																	currentMonth.getMonth() + 1,
 																).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 																const dayData = attendanceByDate[dateStr];
 																const hasAttendance = dayData && dayData.records.length > 0;
@@ -563,14 +563,14 @@ export default function StudentDetail() {
 																			allPresent
 																				? 'bg-green-100 text-green-800 border border-green-300 hover:bg-green-200'
 																				: allAbsent
-																				? 'bg-red-100 text-red-800 border border-red-300 hover:bg-red-200'
-																				: hasAttendance
-																				? 'bg-yellow-100 text-yellow-800 border border-yellow-300 hover:bg-yellow-200'
-																				: 'text-gray-400 hover:bg-gray-100'
+																					? 'bg-red-100 text-red-800 border border-red-300 hover:bg-red-200'
+																					: hasAttendance
+																						? 'bg-yellow-100 text-yellow-800 border border-yellow-300 hover:bg-yellow-200'
+																						: 'text-gray-400 hover:bg-gray-100'
 																		}`}
 																	>
 																		{day}
-																	</div>
+																	</div>,
 																);
 															}
 
