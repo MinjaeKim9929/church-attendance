@@ -61,32 +61,36 @@ export default function AttendanceStats() {
 			try {
 				setIsLoadingDetails(true);
 
+				// Fetch each class's records once; per-class stats (totals/rate) are
+				// derived from those records below instead of a separate API call
 				const results = await Promise.all(
 					classes.map((cls) =>
-						Promise.all([
-							axios
-								.get(`${API_URL}/attendance/stats/class/${encodeURIComponent(cls.className)}`, {
-									params: { schoolYear },
-									withCredentials: true,
-								})
-								.then((r) => ({ className: cls.className, stats: r.data }))
-								.catch(() => ({ className: cls.className, stats: null })),
-							axios
-								.get(`${API_URL}/attendance/class/${encodeURIComponent(cls.className)}`, {
-									params: { schoolYear },
-									withCredentials: true,
-								})
-								.then((r) => ({ className: cls.className, records: r.data.attendanceRecords || [] }))
-								.catch(() => ({ className: cls.className, records: [] })),
-						]),
+						axios
+							.get(`${API_URL}/attendance/class/${encodeURIComponent(cls.className)}`, {
+								params: { schoolYear },
+								withCredentials: true,
+							})
+							.then((r) => ({ className: cls.className, records: r.data.attendanceRecords || [] }))
+							.catch(() => ({ className: cls.className, records: [] })),
 					),
 				);
 
 				const statsMap = {};
 				const recordsMap = {};
-				results.forEach(([statsResult, recordsResult]) => {
-					statsMap[statsResult.className] = statsResult.stats;
-					recordsMap[recordsResult.className] = recordsResult.records;
+				results.forEach(({ className, records }) => {
+					recordsMap[className] = records;
+
+					const totalRecords = records.length;
+					const presentCount = records.filter((r) => r.status === 'Present').length;
+					const absentCount = records.filter((r) => r.status === 'Absent').length;
+					const attendanceRate = totalRecords > 0 ? ((presentCount / totalRecords) * 100).toFixed(2) : '0';
+
+					statsMap[className] = {
+						totalRecords,
+						presentCount,
+						absentCount,
+						attendanceRate: `${attendanceRate}%`,
+					};
 				});
 
 				setClassStatsMap(statsMap);

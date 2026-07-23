@@ -8,7 +8,7 @@ const generateToken = (userId, res, rememberMe = false) => {
 	res.cookie('jwt', token, {
 		httpOnly: true,
 		secure: process.env.NODE_ENV === 'production',
-		sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+		sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
 		maxAge: rememberMe ? 30 * 24 * 60 * 60 * 1000 : 2 * 60 * 60 * 1000,
 		path: '/',
 	});
@@ -38,14 +38,20 @@ const getSchoolYearFromDate = (date = new Date()) => {
 
 // Helper function to find student's class based on grade and class configuration
 // This will be used by attendance controller after fetching ClassConfiguration
-const getClassFromGradeAndConfig = (grade, classConfiguration) => {
+const getClassFromGradeAndConfig = (grade, classConfiguration, studentId = null) => {
 	if (!classConfiguration || !classConfiguration.classes) {
 		return null;
 	}
 
 	for (const classInfo of classConfiguration.classes) {
-		if (classInfo.grades.includes(grade)) {
-			return classInfo.className;
+		if (classInfo.selectionMode === 'students') {
+			if (studentId && classInfo.students && classInfo.students.map(String).includes(String(studentId))) {
+				return classInfo.className;
+			}
+		} else {
+			if (classInfo.grades.includes(grade)) {
+				return classInfo.className;
+			}
 		}
 	}
 

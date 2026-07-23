@@ -55,7 +55,7 @@ export default function Students() {
 			filtered = studentsWithNumbers.filter(
 				(student) =>
 					student.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-					student.christianName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+					(student.christianName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
 					student.grade.toLowerCase() === searchTerm.toLowerCase()
 			);
 		}

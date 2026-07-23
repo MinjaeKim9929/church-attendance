@@ -34,7 +34,7 @@ const createAttendance = async (req, res) => {
 		}
 
 		// Calculate class from student's grade using configuration
-		const studentClass = getClassFromGradeAndConfig(student.grade, classConfig);
+		const studentClass = getClassFromGradeAndConfig(student.grade, classConfig, student._id);
 		if (!studentClass) {
 			return res.status(400).json({ message: `Student's grade (${student.grade}) is not assigned to any class for year ${year}` });
 		}
@@ -180,7 +180,7 @@ const getAttendanceByClassAndDate = async (req, res) => {
 		// Get all students in this class based on configuration
 		const students = await Student.find();
 		const classStudents = students.filter((student) => {
-			return getClassFromGradeAndConfig(student.grade, classConfig) === className;
+			return getClassFromGradeAndConfig(student.grade, classConfig, student._id) === className;
 		});
 
 		// Get attendance records for this date
@@ -308,6 +308,45 @@ const getAttendanceByDate = async (req, res) => {
 	}
 };
 
+// @desc    Get all attendance within a date range (all classes)
+// @route   GET /api/attendance/range?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD
+// @access  Protected
+const getAttendanceByDateRange = async (req, res) => {
+	try {
+		const { startDate, endDate, schoolYear } = req.query;
+
+		// Validation
+		if (!startDate || !endDate) {
+			return res.status(400).json({ message: 'Please provide startDate and endDate' });
+		}
+
+		// Determine school year (use provided or auto-calculate)
+		const year = schoolYear || getSchoolYearFromDate(new Date(startDate));
+
+		// Get the Attendance model for this school year
+		const Attendance = getAttendanceModel(year);
+
+		const attendanceRecords = await Attendance.find({
+			date: {
+				$gte: new Date(startDate),
+				$lte: new Date(endDate),
+			},
+		})
+			.populate('studentId', 'fullName grade gender')
+			.populate('recordedBy', 'fullName email')
+			.sort({ date: 1 });
+
+		res.status(200).json({
+			schoolYear: year,
+			startDate,
+			endDate,
+			attendanceRecords,
+		});
+	} catch (err) {
+		res.status(500).json({ message: err.message });
+	}
+};
+
 // @desc    Update attendance record
 // @route   PUT /api/attendance/:schoolYear/:id
 // @access  Protected
@@ -410,6 +449,7 @@ module.exports = {
 	getAttendanceByClass,
 	getAttendanceByStudent,
 	getAttendanceByDate,
+	getAttendanceByDateRange,
 	updateAttendance,
 	deleteAttendance,
 	getClassAttendanceStats,

@@ -201,66 +201,56 @@ export default function Settings() {
 	};
 
 	const handleClassNameChange = (index, value) => {
-		const updatedClasses = [...classes];
-		updatedClasses[index].className = value;
-		setClasses(updatedClasses);
+		setClasses(classes.map((cls, i) => (i === index ? { ...cls, className: value } : cls)));
 	};
 
 	const handleGradeToggle = (classIndex, grade) => {
-		const updatedClasses = [...classes];
-		const gradeIndex = updatedClasses[classIndex].grades.indexOf(grade);
-
-		if (gradeIndex > -1) {
-			// Remove grade
-			updatedClasses[classIndex].grades.splice(gradeIndex, 1);
-		} else {
-			// Add grade
-			updatedClasses[classIndex].grades.push(grade);
-		}
-
-		setClasses(updatedClasses);
+		setClasses(
+			classes.map((cls, i) => {
+				if (i !== classIndex) return cls;
+				const grades = cls.grades.includes(grade) ? cls.grades.filter((g) => g !== grade) : [...cls.grades, grade];
+				return { ...cls, grades };
+			})
+		);
 	};
 
 	const handleSelectionModeChange = (classIndex, mode) => {
-		const updatedClasses = [...classes];
-		updatedClasses[classIndex].selectionMode = mode;
-		// Clear the other selection when switching modes
-		if (mode === 'grades') {
-			updatedClasses[classIndex].students = [];
-		} else {
-			updatedClasses[classIndex].grades = [];
-		}
-		setClasses(updatedClasses);
+		setClasses(
+			classes.map((cls, i) => {
+				if (i !== classIndex) return cls;
+				// Clear the other selection when switching modes
+				return {
+					...cls,
+					selectionMode: mode,
+					students: mode === 'grades' ? [] : cls.students,
+					grades: mode === 'grades' ? cls.grades : [],
+				};
+			})
+		);
 	};
 
 	const handleStudentToggle = (classIndex, studentId) => {
-		const updatedClasses = [...classes];
-		const studentIndex = updatedClasses[classIndex].students.indexOf(studentId);
-
-		if (studentIndex > -1) {
-			// Remove student
-			updatedClasses[classIndex].students.splice(studentIndex, 1);
-		} else {
-			// Add student
-			updatedClasses[classIndex].students.push(studentId);
-		}
-
-		setClasses(updatedClasses);
+		setClasses(
+			classes.map((cls, i) => {
+				if (i !== classIndex) return cls;
+				const students = cls.students.includes(studentId)
+					? cls.students.filter((id) => id !== studentId)
+					: [...cls.students, studentId];
+				return { ...cls, students };
+			})
+		);
 	};
 
 	const handleTeacherToggle = (classIndex, userId) => {
-		const updatedClasses = [...classes];
-		const teacherIndex = updatedClasses[classIndex].teachers.indexOf(userId);
-
-		if (teacherIndex > -1) {
-			// Remove teacher
-			updatedClasses[classIndex].teachers.splice(teacherIndex, 1);
-		} else {
-			// Add teacher
-			updatedClasses[classIndex].teachers.push(userId);
-		}
-
-		setClasses(updatedClasses);
+		setClasses(
+			classes.map((cls, i) => {
+				if (i !== classIndex) return cls;
+				const teachers = cls.teachers.includes(userId)
+					? cls.teachers.filter((id) => id !== userId)
+					: [...cls.teachers, userId];
+				return { ...cls, teachers };
+			})
+		);
 	};
 
 	const handleDragStart = (e, index) => {

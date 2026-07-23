@@ -18,8 +18,22 @@ const createOrUpdateClassConfig = async (req, res) => {
 
 		// Validate each class
 		for (const classInfo of classes) {
-			if (!classInfo.className || !classInfo.grades || !Array.isArray(classInfo.grades)) {
-				return res.status(400).json({ message: 'Each class must have className and grades array' });
+			if (!classInfo.className || !classInfo.className.trim()) {
+				return res.status(400).json({ message: 'Each class must have a className' });
+			}
+
+			const selectionMode = classInfo.selectionMode || 'grades';
+
+			if (selectionMode === 'students') {
+				if (!Array.isArray(classInfo.students) || classInfo.students.length === 0) {
+					return res
+						.status(400)
+						.json({ message: `Class "${classInfo.className}" must have at least one student selected` });
+				}
+			} else {
+				if (!Array.isArray(classInfo.grades) || classInfo.grades.length === 0) {
+					return res.status(400).json({ message: `Class "${classInfo.className}" must have at least one grade selected` });
+				}
 			}
 		}
 

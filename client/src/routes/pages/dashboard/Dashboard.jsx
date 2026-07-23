@@ -146,30 +146,35 @@ export default function Dashboard() {
 			const firstDay = new Date(year, month, 1);
 			const lastDay = new Date(year, month + 1, 0);
 
-			// Fetch attendance for each day in the month
-			const attendancePromises = [];
-			for (let day = firstDay; day <= lastDay; day.setDate(day.getDate() + 1)) {
+			// Fetch the whole month's attendance in a single request instead of one per day
+			const response = await axios.get(`${API_URL}/attendance/range`, {
+				params: {
+					startDate: getLocalDateString(firstDay),
+					endDate: getLocalDateString(lastDay),
+				},
+				withCredentials: true,
+			});
+
+			// Group records by date
+			const recordsByDate = {};
+			response.data.attendanceRecords.forEach((record) => {
+				if (selectedClass._id !== 'all' && record.class !== selectedClass.className) return;
+				const dateStr = record.date.split('T')[0];
+				if (!recordsByDate[dateStr]) recordsByDate[dateStr] = [];
+				recordsByDate[dateStr].push(record);
+			});
+
+			// Build one entry per day of the month (even days with no records)
+			const attendanceData = [];
+			for (let day = new Date(firstDay); day <= lastDay; day.setDate(day.getDate() + 1)) {
 				const dateStr = getLocalDateString(new Date(day));
-				attendancePromises.push(
-					axios
-						.get(`${API_URL}/attendance/date/${dateStr}`, {
-							withCredentials: true,
-						})
-						.then((response) => ({
-							date: dateStr,
-							records:
-								selectedClass._id === 'all'
-									? response.data.attendanceRecords
-									: response.data.attendanceRecords.filter((record) => record.class === selectedClass.className),
-						}))
-						.catch(() => ({ date: dateStr, records: [] }))
-				);
+				attendanceData.push({ date: dateStr, records: recordsByDate[dateStr] || [] });
 			}
 
-			const attendanceData = await Promise.all(attendancePromises);
 			setMonthlyAttendance(attendanceData);
 		} catch (err) {
 			console.error('Error fetching monthly attendance:', err);
+			setMonthlyAttendance([]);
 		}
 	};
 

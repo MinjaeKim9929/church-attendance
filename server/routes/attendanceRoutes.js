@@ -6,6 +6,7 @@ const {
 	getAttendanceByClass,
 	getAttendanceByStudent,
 	getAttendanceByDate,
+	getAttendanceByDateRange,
 	updateAttendance,
 	deleteAttendance,
 	getClassAttendanceStats,
@@ -27,6 +28,7 @@ router.get('/stats/class/:className', protect, getClassAttendanceStats);
 router.get('/student/:studentId', protect, getAttendanceByStudent);
 
 // Date-based queries
+router.get('/range', protect, getAttendanceByDateRange);
 router.get('/date/:date', protect, getAttendanceByDate);
 
 // Single record CRUD

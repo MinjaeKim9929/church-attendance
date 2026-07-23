@@ -18,9 +18,10 @@ export default function ClassAttendance() {
 	const { id } = useParams();
 	const navigate = useNavigate();
 	const location = useLocation();
-	const classInfo = location.state?.classInfo;
 	const initialDate = location.state?.selectedDate || getLocalDateString();
 
+	const [classInfo, setClassInfo] = useState(location.state?.classInfo || null);
+	const [isLoadingClassInfo, setIsLoadingClassInfo] = useState(!location.state?.classInfo);
 	const [students, setStudents] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [selectedDate, setSelectedDate] = useState(initialDate);
@@ -28,10 +29,66 @@ export default function ClassAttendance() {
 	const [isSaving, setIsSaving] = useState(false);
 	const [toast, setToast] = useState(null);
 
-	// Fetch students on mount
+	// Resolve class info: use data passed via navigation state, otherwise
+	// fetch it from the server (needed after a page refresh or direct link,
+	// since navigation state is lost in those cases)
 	useEffect(() => {
-		fetchStudents();
+		if (location.state?.classInfo) return;
+
+		const fetchClassInfo = async () => {
+			try {
+				setIsLoadingClassInfo(true);
+
+				if (id === 'all') {
+					setClassInfo({
+						id: 'all',
+						name: '전체 학생',
+						selectionMode: 'all',
+						grades: [],
+						students: [],
+						description: '모든 학년',
+					});
+					return;
+				}
+
+				const yearResponse = await axios.get(`${API_URL}/class-config/current/year`, {
+					withCredentials: true,
+				});
+				const configResponse = await axios.get(`${API_URL}/class-config/${yearResponse.data.schoolYear}`, {
+					withCredentials: true,
+				});
+				const cls = (configResponse.data.classes || []).find((c) => c._id === id);
+
+				if (cls) {
+					setClassInfo({
+						id: cls._id,
+						name: cls.className,
+						selectionMode: cls.selectionMode || 'grades',
+						grades: cls.grades || [],
+						students: cls.students || [],
+						description:
+							cls.selectionMode === 'students'
+								? `${cls.students?.length || 0}명의 학생`
+								: (cls.grades || []).join(', ') + '학년',
+					});
+				}
+			} catch (err) {
+				console.error('Error fetching class info:', err);
+			} finally {
+				setIsLoadingClassInfo(false);
+			}
+		};
+
+		fetchClassInfo();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [id]);
+
+	// Fetch students once class info is resolved
+	useEffect(() => {
+		if (isLoadingClassInfo || !classInfo) return;
+		fetchStudents();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [id, classInfo, isLoadingClassInfo]);
 
 	// Fetch attendance when date changes
 	useEffect(() => {
@@ -92,6 +149,8 @@ export default function ClassAttendance() {
 	};
 
 	const fetchAttendanceForDate = async () => {
+		if (!classInfo) return;
+
 		try {
 			// Fetch attendance records for the selected date and class
 			const response = await axios.get(`${API_URL}/attendance/date/${selectedDate}`, {
@@ -195,6 +254,34 @@ export default function ClassAttendance() {
 
 	const presentCount = Object.values(attendance).filter((status) => status === true).length;
 	const absentCount = Object.values(attendance).filter((status) => status === false).length;
+
+	if (isLoadingClassInfo) {
+		return (
+			<div className="max-w-7xl mx-auto flex items-center justify-center py-20">
+				<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+			</div>
+		);
+	}
+
+	if (!classInfo) {
+		return (
+			<div className="max-w-7xl mx-auto">
+				<div className="mb-6">
+					<button
+						onClick={() => navigate('/dashboard/attendance')}
+						className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors hover:cursor-pointer mb-6"
+					>
+						<ArrowLeft className="w-5 h-5" />
+						<span>반 선택으로 돌아가기</span>
+					</button>
+				</div>
+				<div className="bg-yellow-50 border border-yellow-200 rounded-xl p-8 text-center">
+					<p className="text-yellow-800 font-medium">반 정보를 찾을 수 없습니다.</p>
+					<p className="text-yellow-700 text-sm mt-1">출석 관리 페이지에서 반을 선택해주세요.</p>
+				</div>
+			</div>
+		);
+	}
 
 	return (
 		<>
@@ -427,9 +514,6 @@ export default function ClassAttendance() {
 							)}
 						</>
 					)}
-
-			{/* Toast Notification */}
-			{toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} duration={3000} />}
 		</div>
 		</>
 	);
