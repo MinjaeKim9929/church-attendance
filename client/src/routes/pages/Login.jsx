@@ -62,7 +62,6 @@ export default function Login() {
 
 		// If there are no errors, proceed with login
 		if (!newErrors.email && !newErrors.password) {
-			console.log('Login attempt: ', { email, password });
 			try {
 				await login({ email, password, rememberMe });
 				setToast({

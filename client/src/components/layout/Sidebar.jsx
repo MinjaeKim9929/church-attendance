@@ -13,6 +13,30 @@ export default function Sidebar() {
 	const location = useLocation();
 	const { user, logout } = useAuth();
 	const [preferences, setPreferences] = useState(null);
+	const [schoolYear, setSchoolYear] = useState('');
+
+	// Format "25_26" (as stored/returned by the API) into the displayed "2025-26"
+	const formatSchoolYear = (rawSchoolYear) => {
+		const [startYear, endYear] = rawSchoolYear.split('_');
+		return `20${startYear}-${endYear}`;
+	};
+
+	useEffect(() => {
+		const fetchSchoolYear = async () => {
+			try {
+				const response = await axios.get(`${API_URL}/class-config/current/year`, {
+					withCredentials: true,
+				});
+				setSchoolYear(response.data.schoolYear);
+			} catch (error) {
+				console.error('Failed to fetch school year:', error);
+			}
+		};
+
+		if (user) {
+			fetchSchoolYear();
+		}
+	}, [user]);
 
 	useEffect(() => {
 		const fetchPreferences = async () => {
@@ -188,7 +212,7 @@ export default function Sidebar() {
 					</div>
 					<div>
 						<h1 className="text-lg font-semibold text-gray-900">런던 성 김대건 성당</h1>
-						<p className="text-xs text-gray-500">주일학교 2025-26</p>
+						<p className="text-xs text-gray-500">주일학교 {schoolYear && formatSchoolYear(schoolYear)}</p>
 					</div>
 				</div>
 
